@@ -1,30 +1,28 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using Newtonsoft.Json;
 
 [Serializable]
-public class Data
-{
-    public string name;
-    public int maxBlock;
-    public int BPM;
-    public int offset;
-    public Note[] notes;
-}
-
-[Serializable]
-public class Note
-{
-    public int type;
+public class NoteData {
+    public int lpb;
     public int num;
     public int block;
-    public int LPB;
+    public int type;
+    public bool isAttack;
+    public List<NoteData> notes;
 }
 
-public class NotesManager : MonoBehaviour
-{
+[Serializable]
+public class SongData {
+    public string name;
+    public float bpm;
+    public int maxBlock;
+    public int offset;
+    public List<List<NoteData>> notes;
+}
+
+public class NotesManager : MonoBehaviour {
     public int noteNum;
     private string songName;
 
@@ -33,34 +31,81 @@ public class NotesManager : MonoBehaviour
     public List<float> NotesTime = new List<float>();
     public List<GameObject> NotesObj = new List<GameObject>();
 
-    [SerializeField] private float NotesSpeed;
-    [SerializeField] GameObject noteObj;
+    [SerializeField] private float NotesSpeed = 1f;
+    [SerializeField] private GameObject noteObj;
 
     void OnEnable()
     {
         noteNum = 0;
-        songName = "warm-nights";
+        songName = "warm-nights"; // !UPDATE idから出す
         Load(songName);
     }
 
     void Load(string SongName)
     {
-        string inputString = Resources.Load<TextAsset>(SongName).ToString();
-        Data inputJson = JsonUtility.FromJson<Data>(inputString);
-
-        noteNum = inputJson.notes.Length;
-
-        for(int i = 0; i < inputJson.notes.Length; i++)
+        TextAsset jsonFile = Resources.Load<TextAsset>(SongName);
+        if(jsonFile == null)
         {
-            float sensetion = 60 / (inputJson.BPM * (float)inputJson.notes[i].LPB);
-            float beatSec = sensetion * (float)inputJson.notes[i].LPB;
-            float time = 60 / (inputJson.BPM * (float)inputJson.notes[i].LPB);
-            NotesTime.Add(time);
-            LaneNum.Add(inputJson.notes[i].block);
-            NoteType.Add(inputJson.notes[i].type);
+            Debug.LogError("❌ JSON file not found in Resources: " + SongName);
+            return;
+        }
 
-            float z = NotesTime[i] * NotesSpeed;
-            NotesObj.Add(Instantiate(noteObj, new Vector3(inputJson.notes[i].block - 1.5f, 0.5f, z), Quaternion.identity));
+        SongData data;
+        try
+        {
+            data = JsonConvert.DeserializeObject<SongData>(jsonFile.text);
+        }
+        catch(Exception ex)
+        {
+            Debug.LogError("❌ JSON parse error: " + ex.Message);
+            return;
+        }
+
+        if(data == null || data.notes == null)
+        {
+            Debug.LogError("❌ Invalid or empty JSON structure");
+            return;
+        }
+
+        float bpm = data.bpm > 0 ? data.bpm : 120f;
+
+        foreach(var lane in data.notes)
+        {
+            if(lane == null) continue;
+
+            foreach(var note in lane)
+            {
+                if(note == null) continue;
+                if(note.lpb <= 0) note.lpb = 4;
+
+                float time = (note.num / (float)note.lpb) * (60f / bpm);
+                if(float.IsNaN(time) || float.IsInfinity(time)) continue;
+
+                NotesTime.Add(time);
+                LaneNum.Add(note.block);
+                NoteType.Add(note.type);
+            }
+        }
+
+        noteNum = NotesTime.Count;
+
+        for(int i = 0; i < noteNum; i++)
+        {
+            float z = NotesTime[i] * NotesSpeed + 25;
+
+            float laneWidth = 1.0f;
+            float laneCount = 4f;
+            float x = (LaneNum[i] - (laneCount - 1) / 2f) * laneWidth;
+
+            float y = 0.5f;
+
+            if(float.IsNaN(z) || float.IsInfinity(z))
+            {
+                continue;
+            }
+
+            GameObject newNote = Instantiate(noteObj, new Vector3(x, y, z), Quaternion.identity);
+            NotesObj.Add(newNote);
         }
     }
 }
