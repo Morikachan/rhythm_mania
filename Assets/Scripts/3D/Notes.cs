@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class Notes : MonoBehaviour
 {
-    int NoteSpeed = 5;
+    float NoteSpeed = 5;
+
+    void Start()
+    {
+        NoteSpeed = GameManager.instance.noteSpeed;
+    }
     void Update()
     {
         transform.position -= transform.forward * Time.deltaTime * NoteSpeed;

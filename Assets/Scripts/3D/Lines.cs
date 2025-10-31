@@ -12,7 +12,6 @@ public class Light : MonoBehaviour
         rend = GetComponent<Renderer>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(!(rend.material.color.a <= 0))

@@ -22,15 +22,15 @@ public class NoteObject : MonoBehaviour
 
                 if(Mathf.Abs(transform.position.y) > 0.25)
                 {
-                    GameManager.instance.NormalHit();
+                    GameManager2D.instance.NormalHit();
                     Instantiate(hitEffect, targetObjectTransform.position, targetObjectTransform.rotation);
                 } else if (Mathf.Abs(transform.position.y) > 0.05)
                 {
-                    GameManager.instance.GoodHit();
+                    GameManager2D.instance.GoodHit();
                     Instantiate(goodEffect, targetObjectTransform.position, targetObjectTransform.rotation);
                 } else
                 {
-                    GameManager.instance.PerfectHit();
+                    GameManager2D.instance.PerfectHit();
                     Instantiate(perfectEffect, targetObjectTransform.position, targetObjectTransform.rotation);
                 }
             }
@@ -51,7 +51,7 @@ public class NoteObject : MonoBehaviour
         {
             canBePressed = false;
 
-            GameManager.instance.NoteMissed();
+            GameManager2D.instance.NoteMissed();
             Instantiate(missEffect, targetObjectTransform.position, targetObjectTransform.rotation);
         }
     }
