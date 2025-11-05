@@ -1,5 +1,5 @@
 <?php
-require_once '../core/Database.php';
+require_once './core/Database.php';
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     http_response_code(405);
@@ -126,8 +126,6 @@ date_default_timezone_set('Asia/Tokyo');
 $formattedRegistrationDate = date("Y-m-d H:i:s");
 
 $random_id = generateSecureRandomString(6);
-
-$pdo = Database::getInstance()->getPDO();
 
 while (searchID($pdo, $random_id)) {
     $random_id = generateSecureRandomString(6);

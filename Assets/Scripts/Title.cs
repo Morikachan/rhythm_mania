@@ -37,6 +37,17 @@ public class Title : MonoBehaviour {
         ConfirmButton.onClick.AddListener(ConfirmButtonClick);
     }
 
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        { 
+            if(!createUserPop.activeSelf)
+            {
+                OnScreenClicked();
+            }
+        }
+    }
+
     public void ConfirmButtonClick()
     {
         Debug.Log("Button Clicked!");
@@ -49,7 +60,7 @@ public class Title : MonoBehaviour {
         {
             currentUserID = PlayerPrefs.GetString(USER_ID_KEY);
             Debug.Log("User ID: " + currentUserID);
-            SceneManager.LoadScene("ResultScene");
+            SceneManager.LoadScene("HomeScreen");
         }
         else
         {
