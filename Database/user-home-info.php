@@ -31,7 +31,7 @@ function selectUserHomeCharacter($pdo, $user_id)
         $character = $stmt->fetch(PDO::FETCH_ASSOC);
         return $character;
     } catch (PDOException $e) {
-        echo $e->getMessage();
+        // echo $e->getMessage();
         return false;
     }
 }
@@ -45,7 +45,7 @@ function selectLevelRequirements($pdo)
         $levelTable = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $levelTable;
     } catch (PDOException $e) {
-        echo $e->getMessage();
+        // echo $e->getMessage();
         return false;
     }
 }
@@ -57,25 +57,10 @@ function selectUserItemInventory($pdo, $user_id)
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
-        $userItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $userItems;
+        $user_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $user_items;
     } catch (PDOException $e) {
-        echo $e->getMessage();
-        return false;
-    }
-}
-
-function selectUsername($pdo, $user_id)
-{
-    $sql = "SELECT username FROM users_info WHERE user_id = :user_id";
-    try {
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute();
-        $username = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $username;
-    } catch (PDOException $e) {
-        echo $e->getMessage();
+        // echo $e->getMessage();
         return false;
     }
 }
@@ -91,45 +76,38 @@ function selectUsername($pdo, $user_id)
     }
 
     $user_id = $data['user_id'];
-
+    
     date_default_timezone_set('Asia/Tokyo');
 
     $user = selectUserData($pdo, $user_id);
 
-    $homeCharacter_id = selectUserHomeCharacter($pdo, $user_id)['home_card_id'];
-    $levelsTable = selectLevelRequirements($pdo);
+    $home_character_id = selectUserHomeCharacter($pdo, $user_id)['home_card_id'];
+    $levels_table = selectLevelRequirements($pdo);
 
-    $userExp = $_SESSION['user']['user_exp'];
-    $userLevel = 1;
-    $nextLevelExp = null;
+    $user_exp = $user['user_exp'];
+    $user_level = 1;
+    $next_level_exp = null;
 
-    $username = selectUsername($pdo, $user_id);
-    $_SESSION['user']['username'] = $username['username'];
-
-    foreach ($levelsTable as $key => $level) {
-        if ($userExp < $level["exp_amount"]) {
-            $nextLevelExp = $level["exp_amount"];
+    foreach ($levels_table as $key => $level) {
+        if ($user_exp < $level["exp_amount"]) {
+            $next_level_exp = $level["exp_amount"];
             break;
         }
-        $userLevel = $level["lvl"];
+        $user_level = $level["lvl"];
     }
 
-    $userItems = selectUserItemInventory($pdo, $_SESSION['user']['user_id']);
-
-    $_SESSION['homeCharacter'] = $homeCharacter_id;
-    $_SESSION['userLvl'] = $userLevel;
-    $_SESSION['nextLvlValue'] = $nextLevelExp;
-    $_SESSION['nextLvlValuePercent'] = floor($userExp * 100 / $nextLevelExp);
+    $user_items = selectUserItemInventory($pdo, $user_id);
 
     if (!$user) {
         echo json_encode([
             'status'  => 'error',
             'message' => '入力されたIDが見つかりませんでした。もう一度やり直してください。',
-            'home_card_id' => null,
             'user_info' => [
                 'user_name' => '',
                 'user_lvl' => 0,
                 'user_exp' => 0,
+                'next_lvl_value' => 0,
+                'next_lvl_percent' => 0,
                 'home_card_id' => 0
             ],
             'user_inventory' => [
@@ -139,22 +117,21 @@ function selectUsername($pdo, $user_id)
             ],
         ], JSON_UNESCAPED_UNICODE);
     } else {
-        updateLastLogin($pdo, $user_id, $loginDate);
-
         echo json_encode([
             'status'  => 'success',
-            'message' => 'User created successfully',
-            'home_card_id' => $user_id,
+            'message' => 'User info get successfully',
             'user_info' => [
-                'user_name' => '',
-                'user_lvl' => 0,
-                'user_exp' => 0,
-                'home_card_id' => 0
+                'user_name' => $user['username'],
+                'user_lvl' => $user_level,
+                'user_exp' => $user_exp,
+                'next_lvl_value' => $next_level_exp,
+                'next_lvl_percent' => floor($user_exp * 100 / $next_level_exp),
+                'home_card_id' => $home_character_id,
             ],
             'user_inventory' => [
-                'free_gems' => $userItems[array_search(1, array_column($userItems, 'item_id'))]['amount'],
-                'paid_gems' => $userItems[array_search(2, array_column($userItems, 'item_id'))]['amount'],
-                'coins' => $userItems[array_search(3, array_column($userItems, 'item_id'))]['amount'],
+                'free_gems' => $user_items[array_search(1, array_column($user_items, 'item_id'))]['amount'],
+                'paid_gems' => $user_items[array_search(2, array_column($user_items, 'item_id'))]['amount'],
+                'coins' => $user_items[array_search(3, array_column($user_items, 'item_id'))]['amount'],
             ],
         ], JSON_UNESCAPED_UNICODE);
     }
