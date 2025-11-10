@@ -6,8 +6,6 @@ public class CardLoader : MonoBehaviour
 {
     public static CardLoader Instance { get; private set; }
 
-    private const string BASE_PATH = @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_illust\";
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -19,7 +17,7 @@ public class CardLoader : MonoBehaviour
         Instance = this;
     }
 
-    public void LoadCardIllustration(int cardId, Image targetImage)
+    public void LoadCardIllustration(Image targetImage, string path, string fileName)
     {
         if (targetImage == null)
         {
@@ -27,8 +25,7 @@ public class CardLoader : MonoBehaviour
             return;
         }
 
-        string fileName = $"card_{cardId}.jpg";
-        string fullPath = Path.Combine(BASE_PATH, fileName);
+        string fullPath = Path.Combine(path, fileName);
 
         if (File.Exists(fullPath))
         {
@@ -36,7 +33,6 @@ public class CardLoader : MonoBehaviour
             if (newSprite != null)
             {
                 targetImage.sprite = newSprite;
-                //targetImage.SetNativeSize();
             }
             else
             {

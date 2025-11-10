@@ -13,6 +13,8 @@ public class HomePage : MonoBehaviour
 
     private const string USER_ID_KEY = "UserID";
 
+    private const string CARD_ICONS_PATH = @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_illust\";
+
     [SerializeField] Slider slider;
     [SerializeField] TMP_Text starsValue;
     [SerializeField] TMP_Text coinsValue;
@@ -78,8 +80,7 @@ public class HomePage : MonoBehaviour
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
 
 
-            //using (UnityWebRequest request = UnityWebRequest.Get(receiveUrl))
-            using (UnityWebRequest request = new UnityWebRequest(receiveUrl, "POST"))
+            using (UnityWebRequest request = UnityWebRequest.Get(receiveUrl))
             {
 
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -137,7 +138,8 @@ public class HomePage : MonoBehaviour
         if (homeImage == null) return;
 
         Debug.Log($"HomePage: CardLoader is ready. Loading Card ID {newCardID} into homeImage.");
-        CardLoader.Instance.LoadCardIllustration(newCardID, homeImage);
+        string fileName = $"card_{newCardID}.jpg";
+        CardLoader.Instance.LoadCardIllustration(homeImage, CARD_ICONS_PATH, fileName);
     }
 
     private void UpdateProgress(int exp)
