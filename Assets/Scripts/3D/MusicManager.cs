@@ -31,11 +31,30 @@ public class MusicManager : MonoBehaviour
         else Debug.LogError("Music clip not found in Resources/Musics/");
     }
 
+    public void PauseAudio()
+    {
+        if (audioSource != null && audioSource.isPlaying)
+        {
+            audioSource.Pause();
+        }
+    }
+    public void ResumeAudio()
+    {
+        if (audioSource != null && !audioSource.isPlaying && played)
+        {
+            audioSource.UnPause();
+        }
+    }
+
     void Update()
     {
-        if(played && !audioSource.isPlaying && audioSource.time > 0)
+        if (played && audioSource.isPlaying)
         {
-            StartCoroutine(EndGame());
+            if (audioSource.time >= audioSource.clip.length - 0.1f)
+            {
+                played = false;
+                StartCoroutine(EndGame());
+            }
         }
     }
 

@@ -12,6 +12,7 @@ public class HomeButton : MonoBehaviour
         {
             case 1:
                 Debug.Log("Game");
+                SceneManager.LoadScene("GameModeSelection");
                 break;
             case 2:
                 Debug.Log("Gacha");
@@ -21,9 +22,13 @@ public class HomeButton : MonoBehaviour
                 Debug.Log("Cards");
                 SceneManager.LoadScene("CardsScreen");
                 break;
-            default:
+            case 4:
                 Debug.Log("Team");
                 SceneManager.LoadScene("TeamScreen");
+                break;
+            default:
+                Debug.Log("Home");
+                SceneManager.LoadScene("HomeScreen");
                 break;
         }
     }
