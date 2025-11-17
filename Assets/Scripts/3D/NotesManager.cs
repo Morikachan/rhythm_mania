@@ -11,6 +11,7 @@ public class NoteData
     public int block;
     public int type;
     public bool isAttack;
+    public List<NoteData> notes; // For long notes
 }
 
 [Serializable]
@@ -37,16 +38,12 @@ public class NotesManager : MonoBehaviour
     private const float spawnZ = 20f;
     private const float judgeZ = -1.5f;
 
-    void Awake()
-    {
-        Load("Blank-Kytt-RSPN");
-    }
-
     public void StartGame()
     {
+        Load("Blank-Kytt-RSPN");
+
         started = true;
         songStartTime = Time.time;
-        SpawnAllNotes();
     }
 
     void Load(string songName)
@@ -70,32 +67,55 @@ public class NotesManager : MonoBehaviour
         foreach (var lane in data.notes)
         {
             if (lane == null) continue;
+
             foreach (var note in lane)
             {
                 if (note == null) continue;
                 if (note.lpb <= 0) note.lpb = 4;
 
-                float time = (note.num / (float)note.lpb) * (60f / bpm);
-                NotesTime.Add(time);
+                float startTime = (note.num / (float)note.lpb) * (60f / bpm);
+                float endTime = startTime;
+
+                // Long note support
+                if(note.notes != null && note.notes.Count > 0)
+                {
+                    float lastNum = note.notes[note.notes.Count - 1].num;
+                    endTime = (lastNum / (float)note.lpb) * (60f / bpm);
+                }
+
+                NotesTime.Add(startTime);
                 LaneNum.Add(note.block);
+
+                GameObject obj = CreateNoteObject(note, startTime, endTime);
+                NotesObj.Add(obj);
             }
         }
 
         Debug.Log($"Loaded {NotesTime.Count} notes");
     }
 
-    void SpawnAllNotes()
+    GameObject CreateNoteObject(NoteData note, float startTime, float endTime)
     {
-        for (int i = 0; i < NotesTime.Count; i++)
-        {
-            float laneWidth = 1f;
-            float laneCount = 4f;
-            float x = (LaneNum[i] - (laneCount - 1) / 2f) * laneWidth;
-            float y = 0.5f;
+        float laneWidth = 1f;
+        float laneCount = 4f;
+        float x = (note.block - (laneCount - 1) / 2f) * laneWidth;
+        float y = 0.5f;
 
-            GameObject note = Instantiate(notePrefab, new Vector3(x, y, spawnZ), Quaternion.identity);
-            NotesObj.Add(note);
+        GameObject obj;
+
+        if(note.type == 4) // long note
+        {
+            obj = Instantiate(Resources.Load<GameObject>("LongNote"));
+            obj.transform.position = new Vector3(x, y, spawnZ);
+
+            var ln = obj.GetComponent<LongNote>();
+            ln.Init(note.block, startTime, endTime);
+        } else
+        {
+            obj = Instantiate(notePrefab, new Vector3(x, y, spawnZ), Quaternion.identity);
         }
+
+        return obj;
     }
 
     void Update()

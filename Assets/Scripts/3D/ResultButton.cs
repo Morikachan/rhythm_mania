@@ -15,7 +15,7 @@ public class ResultButton : MonoBehaviour
                 break;
             case 2:
                 Debug.Log("SongSelection");
-                SceneManager.LoadScene("SelectSongScreen");
+                SceneManager.LoadScene("SelectSongScene");
                 break;
             default:
                 Debug.Log("Return");
