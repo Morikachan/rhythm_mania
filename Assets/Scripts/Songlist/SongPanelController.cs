@@ -64,7 +64,6 @@ public class SongPanelController : MonoBehaviour
         if (isSelected)
         {
             backgroundImage.color = selectedColor;
-            print("Selected");
         }
         else
         {

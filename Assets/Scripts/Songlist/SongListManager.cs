@@ -5,19 +5,21 @@ using UnityEngine.Networking;
 using TMPro;
 using System.Collections.Generic;
 using System.Text;
-//using UnityEditor.PackageManager.Requests;
 
 public class SongListManager : MonoBehaviour
 {
     public GameObject songPanelPrefab;
     public Transform contentParent;
 
+    public Image songIllustImage;
+
     [Header("Info Panel References")]
-    //public TextMeshProUGUI infoSongName;
-    //public TextMeshProUGUI infoLevel;
-    //public TextMeshProUGUI infoBPM;
+    public TextMeshProUGUI infoSongCombo;
+    public TextMeshProUGUI infoSongScore;
+
 
     private SongPanelController currentSelectedPanel;
+    public SampleSongManager sampleSongManager;
 
     private const string USER_ID_KEY = "UserID";
 
@@ -89,15 +91,6 @@ public class SongListManager : MonoBehaviour
 
                     // Create the songs' panels
                     CreateSongPanels(receivedData.song_list);
-
-                    //CURRENT_CARD_ID = receivedData.user_info.home_card_id;
-
-                    //StartCoroutine(WaitForCardLoaderAndDisplay());
-                    //UpdateProgress(receivedData.user_info.next_lvl_percent);
-
-                    //starsValue.text = (receivedData.user_inventory.paid_gems + receivedData.user_inventory.free_gems).ToString();
-                    //coinsValue.text = receivedData.user_inventory.coins.ToString();
-                    //levelValue.text = "Level " + receivedData.user_info.user_lvl;
                 }
                 else
                 {
@@ -108,8 +101,6 @@ public class SongListManager : MonoBehaviour
     }
     public void SelectSong(SongPanelController newPanelController, Song song)
     {
-        // selectedSong = song;
-        print("manager: SelectSong");
         // 1. DESELECT the previous panel
         if(currentSelectedPanel != null)
         {
@@ -120,18 +111,33 @@ public class SongListManager : MonoBehaviour
         currentSelectedPanel = newPanelController;
         currentSelectedPanel.SetSelected(true);
 
+        if(SongDataHolder.instance != null)
+        {
+            SongDataHolder.instance.SetSelectedSong(song);
+        }
+
         // Update the right-side information panel
-        // infoSongName.text = song.song_name;
-        // infoLevel.text = "Level " + song.song_level.ToString();
-        // infoBPM.text = "BPM: " + song.song_bpm.ToString();
+         infoSongCombo.text = song.best_combo;
+         infoSongScore.text = song.best_score.ToString();
         // TODO Image load here
+        DisplaySongIllust(song.song_id);
+
+        sampleSongManager.PlayMusic(song.song_name);
+    }
+
+    public void DisplaySongIllust(int songId)
+    {
+        if (songIllustImage == null) return;
+
+        string fileName = $"song_illust_{songId}.png";
+        SongIllustLoader.instance.LoadSongIllustration(songIllustImage, fileName);
     }
 
     private void CreateSongPanels(List<Song> songs)
     {
         if (songPanelPrefab == null || contentParent == null)
         {
-            Debug.LogError("Prefab or Content Parent not assigned in SongListManager!");
+            Debug.LogError("Prefab or Content Parent not assigned in SongListManager");
             return;
         }
 

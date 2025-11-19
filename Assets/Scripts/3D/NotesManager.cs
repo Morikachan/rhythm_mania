@@ -25,6 +25,7 @@ public class SongData
 public class NotesManager : MonoBehaviour
 {
     [SerializeField] private GameObject notePrefab;
+    [SerializeField] private GameObject noteLongPrefab;
     [SerializeField] private Judge judge;
 
     public List<int> LaneNum = new List<int>();
@@ -40,7 +41,15 @@ public class NotesManager : MonoBehaviour
 
     public void StartGame()
     {
-        Load("Blank-Kytt-RSPN");
+        if (SongDataHolder.instance != null)
+        {
+            Load(SongDataHolder.instance.SelectedSongName);
+        }
+        else
+        {
+            Load("Blank-Kytt-RSPN");
+            Debug.LogError("No song selected! Starting with default song.");
+        }
 
         started = true;
         songStartTime = Time.time;
@@ -105,7 +114,7 @@ public class NotesManager : MonoBehaviour
 
         if(note.type == 4) // long note
         {
-            obj = Instantiate(Resources.Load<GameObject>("LongNote"));
+            obj = Instantiate(noteLongPrefab);
             obj.transform.position = new Vector3(x, y, spawnZ);
 
             var ln = obj.GetComponent<LongNote>();

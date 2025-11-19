@@ -379,6 +379,8 @@ MonoBehaviour:
   greatText: {fileID: 1437146810}
   badText: {fileID: 378475703}
   misseText: {fileID: 13689241}
+  rankText: {fileID: 1161695920}
+  url: http://localhost/rhythm_mania/Database/update_user_song.php
 --- !u!4 &126183279
 Transform:
   m_ObjectHideFlags: 0
@@ -615,7 +617,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.054734774, g: 0.7735849, b: 0.08574541, a: 1}
+  m_Color: {r: 0, g: 0.46935105, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1654,7 +1656,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.9479667, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 0.7573266, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1959,7 +1961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.5030503, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.9590502, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

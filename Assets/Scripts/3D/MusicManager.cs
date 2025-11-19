@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MusicManager : MonoBehaviour
 {
+    private string songName;
     private AudioSource audioSource;
     public bool played = false;
 
@@ -12,13 +13,21 @@ public class MusicManager : MonoBehaviour
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        if (SongDataHolder.instance != null)
+        {
+            songName = SongDataHolder.instance.SelectedSongName;
+        }
+        else
+        {
+            Debug.LogError("No song selected! Starting with default song.");
+            SceneManager.LoadScene("HomeScreen");
+        }
     }
 
     public void PlayMusic()
     {
         if (audioSource.clip == null)
         {
-            string songName = "Blank-Kytt-RSPN";
             audioSource.clip = Resources.Load<AudioClip>("Musics/" + songName);
         }
 
