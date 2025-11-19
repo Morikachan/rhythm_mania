@@ -9,6 +9,8 @@ public class Judge : MonoBehaviour
     private AudioSource audioSource;
     private const float judgeZ = 0f;
 
+    public enum JudgeType { Perfect = 0, Great = 1, Bad = 2 }
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -70,7 +72,7 @@ public class Judge : MonoBehaviour
         notesManager.RemoveNoteData(index);
     }
 
-    void ShowJudge(int type)
+    public void ShowJudge(int type)
     {
         Instantiate(MessageObj[type], new Vector3(0, 0.8f, judgeZ), Quaternion.identity);
     }

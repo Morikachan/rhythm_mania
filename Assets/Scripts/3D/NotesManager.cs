@@ -32,12 +32,17 @@ public class NotesManager : MonoBehaviour
     public List<float> NotesTime = new List<float>();
     public List<GameObject> NotesObj = new List<GameObject>();
 
+    public float spawnOffset = 15f;
+
     private float bpm = 120f;
     private float songStartTime;
     private bool started = false;
 
-    private const float spawnZ = 20f;
     private const float judgeZ = -1.5f;
+
+    [Header("Settings")]
+    public float laneWidth = 1f;
+    public float laneCount = 4f;
 
     public void StartGame()
     {
@@ -57,112 +62,114 @@ public class NotesManager : MonoBehaviour
 
     void Load(string songName)
     {
-        TextAsset jsonFile = Resources.Load<TextAsset>(songName);
-        if (jsonFile == null)
+        TextAsset json = Resources.Load<TextAsset>(songName);
+        if(!json)
         {
-            Debug.LogError("JSON file not found: " + songName);
+            Debug.LogError("Song JSON not found!");
             return;
         }
-
-        SongData data = JsonConvert.DeserializeObject<SongData>(jsonFile.text);
-        if (data == null || data.notes == null)
-        {
-            Debug.LogError("Invalid or empty JSON structure");
-            return;
-        }
-
+        SongData data = JsonConvert.DeserializeObject<SongData>(json.text);
         bpm = data.bpm > 0 ? data.bpm : 120f;
 
-        foreach (var lane in data.notes)
+        foreach(var lane in data.notes)
         {
-            if (lane == null) continue;
-
-            foreach (var note in lane)
+            foreach(var note in lane)
             {
-                if (note == null) continue;
-                if (note.lpb <= 0) note.lpb = 4;
+                float start = (note.num / (float)note.lpb) * (60f / bpm);
+                float end = start;
 
-                float startTime = (note.num / (float)note.lpb) * (60f / bpm);
-                float endTime = startTime;
-
-                // Long note support
                 if(note.notes != null && note.notes.Count > 0)
                 {
-                    float lastNum = note.notes[note.notes.Count - 1].num;
-                    endTime = (lastNum / (float)note.lpb) * (60f / bpm);
+                    float last = note.notes[^1].num;
+                    end = (last / (float)note.lpb) * (60f / bpm);
                 }
 
-                NotesTime.Add(startTime);
-                LaneNum.Add(note.block);
-
-                GameObject obj = CreateNoteObject(note, startTime, endTime);
+                GameObject obj = CreateNote(note, start, end);
                 NotesObj.Add(obj);
+                NotesTime.Add(start);
+                LaneNum.Add(note.block);
             }
         }
 
         Debug.Log($"Loaded {NotesTime.Count} notes");
     }
 
-    GameObject CreateNoteObject(NoteData note, float startTime, float endTime)
+    GameObject CreateNote(NoteData data, float start, float end)
     {
-        float laneWidth = 1f;
-        float laneCount = 4f;
-        float x = (note.block - (laneCount - 1) / 2f) * laneWidth;
-        float y = 0.5f;
+        float x = (data.block - (laneCount - 1) / 2f) * laneWidth;
 
-        GameObject obj;
-
-        if(note.type == 4) // long note
+        if(data.type == 4) // long note
         {
-            obj = Instantiate(noteLongPrefab);
-            obj.transform.position = new Vector3(x, y, spawnZ);
+            GameObject obj = Instantiate(noteLongPrefab);
+            obj.transform.position = new Vector3(x, 0.5f, spawnOffset);
 
-            var ln = obj.GetComponent<LongNote>();
-            ln.Init(note.block, startTime, endTime);
-        } else
-        {
-            obj = Instantiate(notePrefab, new Vector3(x, y, spawnZ), Quaternion.identity);
+            LongNote ln = obj.GetComponent<LongNote>();
+            ln.Init(data.block, start, end, judgeZ, spawnOffset, this, judge);
+
+            return obj;
         }
-
-        return obj;
+        else // short note
+        {
+            return Instantiate(
+                notePrefab,
+                new Vector3(x, 0.5f, spawnOffset),
+                Quaternion.identity
+            );
+        }
     }
 
     void Update()
     {
-        if (!started) return;
+        if(!started) return;
 
         float songTime = Time.time - songStartTime;
 
-        for (int i = NotesObj.Count - 1; i >= 0; i--)
+        for(int i = NotesObj.Count - 1; i >= 0; i--)
         {
-            GameObject note = NotesObj[i];
+            GameObject obj = NotesObj[i];
+
+            if(!obj)
+            {
+                RemoveNoteData(i);
+                continue;
+            }
+
+            // LongNotes move themselves → skip them
+            if(obj.GetComponent<LongNote>() != null)
+                continue;
+
             float noteTime = NotesTime[i];
-            float timeToJudge = noteTime - songTime;
+            float t = noteTime - songTime;
 
-            float z = judgeZ + timeToJudge * GameManager.instance.noteSpeed;
+            float z = judgeZ + t * GameManager.instance.noteSpeed + spawnOffset;
 
-            note.transform.position = new Vector3(
-                note.transform.position.x,
-                0.5f,
-                z
-            );
+            obj.transform.position = new Vector3(obj.transform.position.x, 0.5f, z);
 
             // MISS
-            if (z < judgeZ - 0.4f)
+            if(z < judgeZ - 0.4f)
             {
                 GameManager.instance.miss++;
                 GameManager.instance.ResetCombo();
 
-                if (judge) judge.ShowMissEffect();
+                if(judge) judge.ShowMissEffect();
 
-                Destroy(note);
+                Destroy(obj);
                 RemoveNoteData(i);
             }
         }
     }
 
-    public void RemoveNoteData(int index)
+    public void ShowMissFromLong()
     {
+        if(judge) judge.ShowMissEffect();
+    }
+    public void ShowHitFromLong(int type)
+    {
+        if(judge) judge.ShowJudge(type);
+    }
+
+    public void RemoveNoteData(int index) 
+    { 
         NotesObj.RemoveAt(index);
         LaneNum.RemoveAt(index);
         NotesTime.RemoveAt(index);

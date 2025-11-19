@@ -26,7 +26,6 @@ public class SongDataHolder : MonoBehaviour
     {
         SelectedSongName = song.song_name;
         SelectedSongId = song.song_id;
-        Debug.Log(SelectedSongName);
         //FullSelectedSongData = song;
     }
 }
