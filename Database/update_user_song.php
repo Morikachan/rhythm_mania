@@ -21,25 +21,25 @@ function selectSongList($pdo, $song_id, $user_id)
         $songs = $stmt->fetch(PDO::FETCH_ASSOC);
         return $songs;
     } catch (PDOException $e) {
-        // echo $e->getMessage();
+        //echo $e->getMessage();
         return false;
     }
 }
 
 function setNewSongInfo($pdo, $song_id, $user_id, $combo, $score)
 {
-    $sql = "INSERT INTO users_song_results 
-            VALUES(:song_id, :user_id, :best_score, :best_combo);";
+    $sql = "INSERT INTO users_song_results (user_id, song_id, best_combo, best_score)
+            VALUES(:user_id, :song_id, :best_combo, :best_score);";
 
     try {
         $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':song_id', $song_id);
         $stmt->bindParam(':user_id', $user_id);
-        $stmt->bindParam(':best_combo', $combo);
+        $stmt->bindParam(':song_id', $song_id);
         $stmt->bindParam(':best_score', $score);
+        $stmt->bindParam(':best_combo', $combo);
         return $stmt->execute();
     } catch (PDOException $e) {
-        // echo $e->getMessage();
+        //echo $e->getMessage();
         return false;
     }
 }
@@ -56,7 +56,7 @@ function updateSongCombo($pdo, $song_id, $user_id, $combo)
         $stmt->bindParam(':user_id', $user_id);
         return $stmt->execute();
     } catch (PDOException $e) {
-        // echo $e->getMessage();
+        //echo $e->getMessage();
         return false;
     }
 }
@@ -73,7 +73,7 @@ function updateSongScore($pdo, $song_id, $user_id, $score)
         $stmt->bindParam(':user_id', $user_id);
         return $stmt->execute();
     } catch (PDOException $e) {
-        // echo $e->getMessage();
+        //echo $e->getMessage();
         return false;
     }
 }
@@ -116,17 +116,17 @@ if(empty($song_results_exist)) {
 
     if ($user_combo_index > $past_index && $user_score > $past_score) {
         // Set new best combo for song and new best score for song
-        updateSongScore($pdo, $song_id, $user_id, $score);
-        updateSongCombo($pdo, $song_id, $user_id, $combo);
+        updateSongScore($pdo, $song_id, $user_id, $user_score);
+        updateSongCombo($pdo, $song_id, $user_id, $user_combo);
         $combo_isNew = true;
         $score_isNew = true;
     } else if ($user_score > $past_score && $user_combo_index <= $past_index) {
         // Set only new best score for song
-        updateSongScore($pdo, $song_id, $user_id, $score);
+        updateSongScore($pdo, $song_id, $user_id, $user_score);
         $score_isNew = true;
     } else if ($user_score <= $past_score && $user_combo_index > $past_index) {
         // Set only new best combo for song
-        updateSongCombo($pdo, $song_id, $user_id, $combo);
+        updateSongCombo($pdo, $song_id, $user_id, $user_combo);
         $combo_isNew = true;
     }
 }

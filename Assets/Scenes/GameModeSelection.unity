@@ -210,6 +210,7 @@ GameObject:
   - component: {fileID: 624507968}
   - component: {fileID: 624507967}
   - component: {fileID: 624507966}
+  - component: {fileID: 624507969}
   m_Layer: 5
   m_Name: SoloButton
   m_TagString: Untagged
@@ -259,9 +260,9 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 0, g: 0.6451895, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_HighlightedColor: {r: 0.077429675, g: 0.5584048, b: 0.8207547, a: 1}
+    m_PressedColor: {r: 0.078431375, g: 0.5568628, b: 0.8196079, a: 1}
+    m_SelectedColor: {r: 0.078431375, g: 0.5568628, b: 0.8196079, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -280,7 +281,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 624507967}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 624507969}
+        m_TargetAssemblyTypeName: ModeSelectButtons, Assembly-CSharp
+        m_MethodName: ChangeScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &624507967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,6 +332,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 624507964}
   m_CullTransparentMesh: 1
+--- !u!114 &624507969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 624507964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 483b615d1ff9d11489c2765e9f514a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonType: 1
 --- !u!1 &696698399
 GameObject:
   m_ObjectHideFlags: 0
@@ -331,6 +357,7 @@ GameObject:
   - component: {fileID: 696698403}
   - component: {fileID: 696698402}
   - component: {fileID: 696698401}
+  - component: {fileID: 696698404}
   m_Layer: 5
   m_Name: MultiCreate
   m_TagString: Untagged
@@ -380,10 +407,10 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 0.63207537, b: 0.78537726, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_HighlightedColor: {r: 1, g: 0.35686275, b: 0.62352943, a: 1}
+    m_PressedColor: {r: 1, g: 0.35686275, b: 0.62352943, a: 1}
+    m_SelectedColor: {r: 1, g: 0.3584906, b: 0.62222207, a: 1}
+    m_DisabledColor: {r: 1, g: 0.6313726, b: 0.7843138, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -401,7 +428,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 696698402}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 696698404}
+        m_TargetAssemblyTypeName: ModeSelectButtons, Assembly-CSharp
+        m_MethodName: ChangeScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &696698402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -440,6 +479,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 696698399}
   m_CullTransparentMesh: 1
+--- !u!114 &696698404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 696698399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 483b615d1ff9d11489c2765e9f514a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonType: 3
 --- !u!1 &831833300
 GameObject:
   m_ObjectHideFlags: 0
@@ -859,6 +911,7 @@ GameObject:
   - component: {fileID: 1434319914}
   - component: {fileID: 1434319913}
   - component: {fileID: 1434319912}
+  - component: {fileID: 1434319915}
   m_Layer: 5
   m_Name: MultiButton
   m_TagString: Untagged
@@ -908,10 +961,10 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 0.15408784, b: 0.5069359, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_HighlightedColor: {r: 0.8980393, g: 0.10980393, b: 0.43921572, a: 1}
+    m_PressedColor: {r: 0.8980393, g: 0.10980393, b: 0.43921572, a: 1}
+    m_SelectedColor: {r: 0.8962264, g: 0.109914556, b: 0.43754438, a: 1}
+    m_DisabledColor: {r: 1, g: 0.15294118, b: 0.5058824, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -929,7 +982,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1434319913}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1434319915}
+        m_TargetAssemblyTypeName: ModeSelectButtons, Assembly-CSharp
+        m_MethodName: ChangeScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1434319913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -968,6 +1033,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1434319910}
   m_CullTransparentMesh: 1
+--- !u!114 &1434319915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1434319910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 483b615d1ff9d11489c2765e9f514a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonType: 2
 --- !u!1 &1496896186
 GameObject:
   m_ObjectHideFlags: 0
@@ -1232,6 +1310,7 @@ GameObject:
   - component: {fileID: 1776902606}
   - component: {fileID: 1776902605}
   - component: {fileID: 1776902604}
+  - component: {fileID: 1776902607}
   m_Layer: 5
   m_Name: MultiSelect
   m_TagString: Untagged
@@ -1281,10 +1360,10 @@ MonoBehaviour:
   m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 0.63207537, b: 0.78537726, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_HighlightedColor: {r: 1, g: 0.35686275, b: 0.62352943, a: 1}
+    m_PressedColor: {r: 1, g: 0.35686275, b: 0.62352943, a: 1}
+    m_SelectedColor: {r: 1, g: 0.35686275, b: 0.62352943, a: 1}
+    m_DisabledColor: {r: 1, g: 0.35686275, b: 0.62352943, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -1302,7 +1381,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1776902605}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1776902607}
+        m_TargetAssemblyTypeName: ModeSelectButtons, Assembly-CSharp
+        m_MethodName: ChangeScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1776902605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1341,6 +1432,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1776902602}
   m_CullTransparentMesh: 1
+--- !u!114 &1776902607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1776902602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 483b615d1ff9d11489c2765e9f514a5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buttonType: 4
 --- !u!1 &1890762391
 GameObject:
   m_ObjectHideFlags: 0

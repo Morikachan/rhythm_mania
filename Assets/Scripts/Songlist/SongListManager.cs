@@ -50,7 +50,7 @@ public class SongListManager : MonoBehaviour
         public string best_combo;
     };
 
-    void Start()
+    void Awake()
     {
         StartCoroutine(GetJsonData());
     }
@@ -85,7 +85,6 @@ public class SongListManager : MonoBehaviour
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     string jsonResponse = request.downloadHandler.text;
-                    Debug.Log("Received JSON: " + jsonResponse);
 
                     ServerResponse receivedData = JsonUtility.FromJson<ServerResponse>(jsonResponse);
 

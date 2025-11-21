@@ -32,6 +32,8 @@ public class GameManager : MonoBehaviour
     public NotesManager notesManager;
     public MusicManager musicManager;
 
+    public GameObject keyLine;
+
     public void Awake()
     {
         if(instance == null)
@@ -52,6 +54,11 @@ public class GameManager : MonoBehaviour
     IEnumerator StartGameAfterDelay()
     {
         yield return new WaitForSeconds(startDelay);
+
+        if(keyLine != null)
+        {
+            keyLine.SetActive(false);
+        }
 
         started = true;
         startTime = Time.time;

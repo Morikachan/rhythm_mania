@@ -55,7 +55,6 @@ public class Result : MonoBehaviour
         StartCoroutine(GetJsonData());
     }
 
-
     IEnumerator GetJsonData()
     {
         UserData dataToSend = null;
@@ -96,17 +95,28 @@ public class Result : MonoBehaviour
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    string jsonResponse = request.downloadHandler.text;
-                    Debug.Log("Received JSON: " + jsonResponse);
+                    try
+                    {
+                        ServerResponse response = JsonUtility.FromJson<ServerResponse>(request.downloadHandler.text);
 
-                    ServerResponse receivedData = JsonUtility.FromJson<ServerResponse>(jsonResponse);
-
-                    SetResultText();
-                    //ClearData();
+                        if (response.status == "success")
+                        {
+                            SetResultText();
+                            ClearData();
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Server error: " + response.message);
+                        }
+                    }
+                    catch
+                    {
+                        Debug.LogError("Invalid JSON format from server: " + request.downloadHandler.text);
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Error receiving JSON: " + request.error);
+                    Debug.LogError("Network error: " + request.error);
                 }
             }
         }
@@ -122,11 +132,11 @@ public class Result : MonoBehaviour
         float totalHit = perfectCount + greatCount;
         float percentHit = (totalHit / totalNotes) * 100;
 
-        if (badCount != 0 && missCount != 0)
+        if (badCount == 0 && missCount == 0)
         {
             rank = "SS";
         }
-        else if (percentHit > 90)
+        else if (percentHit > 95)
         {
             rank = "S";
         }

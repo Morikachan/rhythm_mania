@@ -92,7 +92,7 @@ public class HomePage : MonoBehaviour
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     string jsonResponse = request.downloadHandler.text;
-                    Debug.Log("Received JSON: " + jsonResponse);
+                    //Debug.Log("Received JSON: " + jsonResponse);
 
                     ServerResponse receivedData = JsonUtility.FromJson<ServerResponse>(jsonResponse);
 
@@ -126,7 +126,6 @@ public class HomePage : MonoBehaviour
 
         while (CardLoader.Instance == null)
         {
-            Debug.LogWarning("HomePage is waiting for CardLoader to initialize...");
             yield return null;
         }
 
@@ -137,7 +136,6 @@ public class HomePage : MonoBehaviour
     {
         if (homeImage == null) return;
 
-        Debug.Log($"HomePage: CardLoader is ready. Loading Card ID {newCardID} into homeImage.");
         string fileName = $"card_{newCardID}.jpg";
         CardLoader.Instance.LoadCardIllustration(homeImage, CARD_ICONS_PATH, fileName);
     }

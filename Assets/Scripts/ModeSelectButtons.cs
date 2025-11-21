@@ -1,29 +1,29 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class HomeButton : MonoBehaviour
+public class ModeSelectButtons : MonoBehaviour
 {
     public int buttonType;
 
     public void ChangeScene()
-    {   
+    {
         switch (buttonType)
         {
             case 1:
-                Debug.Log("Game");
-                SceneManager.LoadScene("GameModeSelection");
+                Debug.Log("Solo Live");
+                SceneManager.LoadScene("SelectSongScene");
                 break;
             case 2:
-                Debug.Log("Gacha");
-                SceneManager.LoadScene("GachaScreen");
+                Debug.Log("Multi Live");
+                SceneManager.LoadScene("SelectSongScene");
                 break;
             case 3:
-                Debug.Log("Cards");
-                SceneManager.LoadScene("CardsScreen");
+                Debug.Log("Create Room");
+                SceneManager.LoadScene("");
                 break;
             case 4:
-                Debug.Log("Team");
-                SceneManager.LoadScene("TeamScreen");
+                Debug.Log("Enter Code");
+                SceneManager.LoadScene("");
                 break;
             default:
                 Debug.Log("Home");
