@@ -50,7 +50,6 @@ public class Title : MonoBehaviour {
 
     public void ConfirmButtonClick()
     {
-        Debug.Log("Button Clicked!");
         StartCoroutine(CreateNewUser());
     }
 
@@ -59,12 +58,11 @@ public class Title : MonoBehaviour {
         if(PlayerPrefs.HasKey(USER_ID_KEY))
         {
             currentUserID = PlayerPrefs.GetString(USER_ID_KEY);
-            Debug.Log("User ID: " + currentUserID);
             SceneManager.LoadScene("HomeScreen");
         }
         else
         {
-            Debug.Log("Local User ID нot found. Creating new user.");
+            // Local User ID нot found. Creating new user.
             createUserPop.SetActive(true);
         }
     }
@@ -90,7 +88,6 @@ public class Title : MonoBehaviour {
 
             if(request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("Response: " + request.downloadHandler.text);
 
                 try
                 {
@@ -100,8 +97,7 @@ public class Title : MonoBehaviour {
                     {
                         PlayerPrefs.SetString(USER_ID_KEY, response.user_id);
                         PlayerPrefs.Save();
-                        Debug.Log("User created successfully. ID: " + response.user_id);
-                        SceneManager.LoadScene("ResultScene");
+                        SceneManager.LoadScene("HomeScreen");
                     }
                     else
                     {

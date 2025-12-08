@@ -10,23 +10,23 @@ public class ModeSelectButtons : MonoBehaviour
         switch (buttonType)
         {
             case 1:
-                Debug.Log("Solo Live");
+                // Solo Live
                 SceneManager.LoadScene("SelectSongScene");
                 break;
             case 2:
-                Debug.Log("Multi Live");
+                // Multi Live
                 SceneManager.LoadScene("SelectSongScene");
                 break;
             case 3:
-                Debug.Log("Create Room");
+                // Create Room
                 SceneManager.LoadScene("");
                 break;
             case 4:
-                Debug.Log("Enter Code");
+                // Enter Code
                 SceneManager.LoadScene("");
                 break;
             default:
-                Debug.Log("Home");
+                // Home
                 SceneManager.LoadScene("HomeScreen");
                 break;
         }

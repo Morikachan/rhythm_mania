@@ -40,6 +40,9 @@ public class GameModeButtons : MonoBehaviour
     }
     public void ToExitGame()
     {
+        pauseMenuPop.SetActive(false);
+        Time.timeScale = 1;
+
         SceneManager.LoadScene("HomeScreen");
     }
 }

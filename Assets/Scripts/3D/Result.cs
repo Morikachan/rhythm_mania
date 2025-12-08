@@ -66,7 +66,6 @@ public class Result : MonoBehaviour
         else
         {
             selected_song_id = 2;
-            Debug.LogError("No song selected! ID of default song.");
         }
 
         if (PlayerPrefs.HasKey(USER_ID_KEY))

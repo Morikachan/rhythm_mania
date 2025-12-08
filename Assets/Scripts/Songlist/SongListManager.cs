@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using TMPro;
@@ -52,10 +51,10 @@ public class SongListManager : MonoBehaviour
 
     void Awake()
     {
-        StartCoroutine(GetJsonData());
+        GetJsonData();
     }
 
-    IEnumerator GetJsonData()
+    async void GetJsonData()
     {
         UserData dataToSend = null;
 
@@ -72,15 +71,14 @@ public class SongListManager : MonoBehaviour
             string jsonString = JsonUtility.ToJson(dataToSend);
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
 
-
-            using (UnityWebRequest request = UnityWebRequest.Get(receiveUrl))
+            using (UnityWebRequest request = new UnityWebRequest(receiveUrl, "GET"))
             {
-
+                request.method = UnityWebRequest.kHttpVerbGET;
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
 
-                yield return request.SendWebRequest();
+                await request.SendWebRequest();
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
@@ -116,9 +114,9 @@ public class SongListManager : MonoBehaviour
         }
 
         // Update the right-side information panel
-         infoSongCombo.text = song.best_combo;
-         infoSongScore.text = song.best_score.ToString();
-        // TODO Image load here
+        infoSongCombo.text = song.best_combo;
+        infoSongScore.text = song.best_score.ToString();
+
         DisplaySongIllust(song.song_id);
 
         sampleSongManager.PlayMusic(song.song_name);
