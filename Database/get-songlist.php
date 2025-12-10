@@ -14,11 +14,12 @@ function selectSongList($pdo, $user_id)
                 s.song_level,
                 s.song_bpm,
                 COALESCE(usi.best_score, 0) AS best_score,
-                COALESCE(usi.best_combo, 'D') AS best_combo
+                COALESCE(usi.best_combo, '—') AS best_combo
             FROM songs AS s
             LEFT JOIN users_song_results AS usi
                 ON usi.song_id = s.song_id
-                AND usi.user_id = :user_id;
+                AND usi.user_id = :user_id
+            ORDER BY s.song_id;
         ";
     try {
         $stmt = $pdo->prepare($sql);
@@ -56,7 +57,7 @@ function selectSongList($pdo, $user_id)
                 'song_level' => 0,
                 'song_bpm' => 0,
                 'best_score' => 0,
-                'best_combo' => "D",
+                'best_combo' => '—',
             ],
         ], JSON_UNESCAPED_UNICODE);
     } else {

@@ -15,7 +15,7 @@ public class ModeSelectButtons : MonoBehaviour
                 break;
             case 2:
                 // Multi Live
-                SceneManager.LoadScene("SelectSongScene");
+                SceneManager.LoadScene("MultiLobby");
                 break;
             case 3:
                 // Create Room

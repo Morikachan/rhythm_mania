@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using TMPro;
@@ -115,7 +115,7 @@ public class SongListManager : MonoBehaviour
 
         // Update the right-side information panel
         infoSongCombo.text = song.best_combo;
-        infoSongScore.text = song.best_score.ToString();
+        infoSongScore.text = song.best_score == 0 ? "—" : song.best_score.ToString();
 
         DisplaySongIllust(song.song_id);
 
