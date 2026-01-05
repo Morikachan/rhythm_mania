@@ -9,7 +9,7 @@ public class Judge : MonoBehaviour
     private AudioSource audioSource;
     private const float judgeZ = 0f;
 
-    public enum JudgeType { Perfect = 0, Great = 1, Bad = 2 }
+    public enum JudgeType { Perfect = 0, Great = 1, Bad = 2, Miss = 3 }
 
     void Start()
     {
@@ -18,7 +18,7 @@ public class Judge : MonoBehaviour
 
     void Update()
     {
-        if (!GameManager.instance.started) return;
+        if (!GameManager.instance.gameStarted) return;
         if (notesManager.NotesObj.Count == 0) return;
 
         if (Input.GetKeyDown(KeyCode.D)) CheckHit(0);
@@ -38,6 +38,9 @@ public class Judge : MonoBehaviour
 
             if (distance <= 0.6f)
                 audioSource.PlayOneShot(hitSound);
+
+            if(note.GetComponent<LongNote>() != null)
+                continue;
 
             if (distance <= 0.2f)
             {
@@ -60,6 +63,7 @@ public class Judge : MonoBehaviour
                 ShowJudge(2); // Bad
                 GameManager.instance.bad++;
                 GameManager.instance.ResetCombo();
+                HPManager.instance.ApplyJudge(JudgeType.Bad);
                 DeleteNoteAt(i);
                 return;
             }

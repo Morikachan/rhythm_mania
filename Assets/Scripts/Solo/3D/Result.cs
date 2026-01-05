@@ -101,7 +101,7 @@ public class Result : MonoBehaviour
                         if (response.status == "success")
                         {
                             SetResultText();
-                            ClearData();
+                            GameManager.instance.ResetGame();
                         }
                         else
                         {
@@ -165,17 +165,5 @@ public class Result : MonoBehaviour
         badText.text = badCount.ToString();
         misseText.text = missCount.ToString();
         rankText.text = rank;
-    }
-
-    public void ClearData()
-    {
-        GameManager.instance.score = 0;
-        GameManager.instance.perfect = 0;
-        GameManager.instance.great = 0;
-        GameManager.instance.bad = 0;
-        GameManager.instance.miss = 0;
-        GameManager.instance.combo = 0;
-        GameManager.instance.maxScore = 0;
-        GameManager.instance.ratioScore = 0;
     }
 }

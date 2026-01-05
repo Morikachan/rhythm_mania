@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 public class GameModeButtons : MonoBehaviour
 {
-    [SerializeField] GameObject pauseMenuPop;
+    [SerializeField] GameObject pauseMenuPopup;
 
     // Reference to the MusicManager
     private MusicManager musicManager;
@@ -20,7 +20,7 @@ public class GameModeButtons : MonoBehaviour
 
     public void ToPauseGame()
     {
-        pauseMenuPop.SetActive(true);
+        pauseMenuPopup.SetActive(true);
         Time.timeScale = 0;
 
         if (musicManager != null)
@@ -30,7 +30,7 @@ public class GameModeButtons : MonoBehaviour
     }
     public void ToResumeGame()
     {
-        pauseMenuPop.SetActive(false);
+        pauseMenuPopup.SetActive(false);
         Time.timeScale = 1;
 
         if (musicManager != null)
@@ -40,8 +40,10 @@ public class GameModeButtons : MonoBehaviour
     }
     public void ToExitGame()
     {
-        pauseMenuPop.SetActive(false);
+        pauseMenuPopup.SetActive(false);
         Time.timeScale = 1;
+
+        GameManager.instance.ResetGame();
 
         SceneManager.LoadScene("HomeScreen");
     }

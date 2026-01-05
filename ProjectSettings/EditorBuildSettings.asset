@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GameModeSelection.unity
     guid: 26f951c08b3963b4d83511065b88817c
   - enabled: 1
-    path: Assets/Scenes/SelectSongScene.unity
+    path: Assets/Scenes/MultiSelectSongScene.unity
     guid: 24f96f415bf12e44d97367cf41543479
   - enabled: 1
     path: Assets/Scenes/3D-game.unity

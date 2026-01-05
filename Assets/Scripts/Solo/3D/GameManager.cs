@@ -12,8 +12,11 @@ public class GameManager : MonoBehaviour
     //public int songID;
     [Header("Game Settings")]
     public float noteSpeed = 5f;
-    public float startDelay = 3f; // Delay before start
-    public bool started = false;
+    public float startDelay = 2f; // Delay before start
+
+    public bool gameStarted;
+    public bool gameEnded;
+
     public float startTime;
 
     [Header("Score Info")]
@@ -33,6 +36,7 @@ public class GameManager : MonoBehaviour
     public MusicManager musicManager;
 
     public GameObject keyLine;
+    [SerializeField] GameObject gameOverPopup;
 
     public void Awake()
     {
@@ -48,6 +52,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        HPManager.instance.ResetHP();
         StartCoroutine(StartGameAfterDelay());
     }
 
@@ -60,11 +65,58 @@ public class GameManager : MonoBehaviour
             keyLine.SetActive(false);
         }
 
-        started = true;
+        gameStarted = false;
+        gameEnded = false;
+
         startTime = Time.time;
 
+        musicManager.ResetMusic();
+
+        float musicDelay = notesManager.spawnOffset / noteSpeed;
+        musicManager.PlayMusic(musicDelay);
+
+
+        gameStarted = true;
+
         notesManager.StartGame();
-        musicManager.PlayMusic();
+    }
+
+
+    public void GameOver()
+    {
+        if(gameEnded) return;
+
+        gameEnded = true;
+        gameStarted = false;
+
+        musicManager.PauseAudio();
+
+        Time.timeScale = 0;
+
+        gameOverPopup.SetActive(true);
+    }
+
+    public void ResetGame()
+    {
+        score = 0;
+        perfect = 0;
+        great = 0;
+        bad = 0;
+        miss = 0;
+        combo = 0;
+        maxScore = 0;
+        ratioScore = 0;
+
+        gameStarted = false;
+        gameEnded = false;
+
+        notesManager.started = false;
+
+        Time.timeScale = 1;
+
+        musicManager.PauseAudio();
+        musicManager.ResetMusic();
+        HPManager.instance.ResetHP();
     }
 
     public void AddScore(int value)

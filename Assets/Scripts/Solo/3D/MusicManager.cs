@@ -5,7 +5,7 @@ using UnityEngine;
 public class MusicManager : MonoBehaviour
 {
     private string songName;
-    private AudioSource audioSource;
+    public AudioSource audioSource;
     public bool played = false;
 
     public GameObject finishText;
@@ -24,20 +24,28 @@ public class MusicManager : MonoBehaviour
         }
     }
 
-    public void PlayMusic()
+    public void PlayMusic(float delay)
     {
         if (audioSource.clip == null)
         {
             audioSource.clip = Resources.Load<AudioClip>("Musics/" + songName);
         }
 
-        if (audioSource.clip)
+        if(audioSource.clip)
         {
-            played = true;
-            audioSource.Play();
-            Debug.Log("Music started!");
+            StartCoroutine(PlayDelayedRoutine(delay));
         }
         else Debug.LogError("Music clip not found in Resources/Musics/");
+    }
+
+    IEnumerator PlayDelayedRoutine(float delay)
+    {
+        // Wait exactly Offset
+        yield return new WaitForSeconds(delay);
+
+        played = true;
+        audioSource.Play();
+        Debug.Log($"Music started after {delay} sec delay!");
     }
 
     public void PauseAudio()
@@ -53,6 +61,20 @@ public class MusicManager : MonoBehaviour
         {
             audioSource.UnPause();
         }
+    }
+
+    public void ResetMusic()
+    {
+        StopAllCoroutines();
+
+        if(audioSource.clip == null)
+        {
+            audioSource.clip = Resources.Load<AudioClip>("Musics/" + songName);
+        }
+
+        audioSource.Stop();
+        audioSource.time = 0f;
+        played = false;
     }
 
     void Update()

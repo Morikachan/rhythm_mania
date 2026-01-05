@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using static Judge;
 
 [Serializable]
 public class NoteData
@@ -36,9 +37,9 @@ public class NotesManager : MonoBehaviour
 
     private float bpm = 120f;
     private float songStartTime;
-    private bool started = false;
+    public bool started = false;
 
-    private const float judgeZ = -1.5f;
+    private const float judgeZ = 0f;
 
     [Header("Settings")]
     public float laneWidth = 1f;
@@ -134,7 +135,7 @@ public class NotesManager : MonoBehaviour
                 continue;
             }
 
-            // LongNotes move themselves → skip them
+            // LongNotes move themselves -> skip them
             if(obj.GetComponent<LongNote>() != null)
                 continue;
 
@@ -150,6 +151,7 @@ public class NotesManager : MonoBehaviour
             {
                 GameManager.instance.miss++;
                 GameManager.instance.ResetCombo();
+                HPManager.instance.ApplyJudge(JudgeType.Miss);
 
                 if(judge) judge.ShowMissEffect();
 
