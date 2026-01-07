@@ -44,7 +44,7 @@ public class GameModeButtons : MonoBehaviour
         Time.timeScale = 1;
 
         GameManager.instance.ResetGame();
-
+        
         SceneManager.LoadScene("HomeScreen");
     }
 }

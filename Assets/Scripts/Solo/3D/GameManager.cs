@@ -117,6 +117,7 @@ public class GameManager : MonoBehaviour
         musicManager.PauseAudio();
         musicManager.ResetMusic();
         HPManager.instance.ResetHP();
+        Destroy(this.gameObject);
     }
 
     public void AddScore(int value)

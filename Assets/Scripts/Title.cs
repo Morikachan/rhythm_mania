@@ -50,7 +50,7 @@ public class Title : MonoBehaviour {
 
     public void ConfirmButtonClick()
     {
-        StartCoroutine(CreateNewUser());
+        CreateNewUser();
     }
 
     public void OnScreenClicked()
@@ -67,7 +67,7 @@ public class Title : MonoBehaviour {
         }
     }
 
-    IEnumerator CreateNewUser()
+    async void CreateNewUser()
     {
         NewUserData dataToSend = new NewUserData
         {
@@ -84,7 +84,7 @@ public class Title : MonoBehaviour {
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
 
-            yield return request.SendWebRequest();
+            await request.SendWebRequest();
 
             if(request.result == UnityWebRequest.Result.Success)
             {

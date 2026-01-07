@@ -11,7 +11,10 @@ public class HomePage : MonoBehaviour
 
     private int CURRENT_CARD_ID = 1;
 
+    [Header("Player References")]
     private const string USER_ID_KEY = "UserID";
+    private const string USER_NAME_KEY = "UserName";
+    private const string HOME_CARD_ID_KEY = "HomeCardID";
 
     private const string CARD_ICONS_PATH = @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_illust\";
 
@@ -58,63 +61,68 @@ public class HomePage : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(GetJsonData());
+        GetJsonData();
     }
 
 
-    IEnumerator GetJsonData()
-    {
-        UserData dataToSend = null;
-
-        if (PlayerPrefs.HasKey(USER_ID_KEY))
+        async void GetJsonData()
         {
-            dataToSend = new UserData
+            UserData dataToSend = null;
+
+            if (PlayerPrefs.HasKey(USER_ID_KEY))
             {
-                user_id = PlayerPrefs.GetString(USER_ID_KEY),
+                dataToSend = new UserData
+                {
+                    user_id = PlayerPrefs.GetString(USER_ID_KEY),
+                };
             };
-        };
 
-        if (dataToSend != null)
-        {
-            string jsonString = JsonUtility.ToJson(dataToSend);
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
-
-
-            using (UnityWebRequest request = UnityWebRequest.Get(receiveUrl))
+            if (dataToSend != null)
             {
+                string jsonString = JsonUtility.ToJson(dataToSend);
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
 
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
 
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityWebRequest.Result.Success)
+                using (UnityWebRequest request = UnityWebRequest.Get(receiveUrl))
                 {
-                    string jsonResponse = request.downloadHandler.text;
-                    //Debug.Log("Received JSON: " + jsonResponse);
 
-                    ServerResponse receivedData = JsonUtility.FromJson<ServerResponse>(jsonResponse);
+                    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                    request.downloadHandler = new DownloadHandlerBuffer();
+                    request.SetRequestHeader("Content-Type", "application/json");
 
-                    CURRENT_CARD_ID = receivedData.user_info.home_card_id;
+                    await request.SendWebRequest();
 
-                    StartCoroutine(WaitForCardLoaderAndDisplay());
-                    UpdateProgress(receivedData.user_info.next_lvl_percent);
+                    if (request.result == UnityWebRequest.Result.Success)
+                    {
+                        string jsonResponse = request.downloadHandler.text;
 
-                    starsValue.text = (receivedData.user_inventory.paid_gems + receivedData.user_inventory.free_gems).ToString();
-                    coinsValue.text = receivedData.user_inventory.coins.ToString();
-                    levelValue.text = "Level " + receivedData.user_info.user_lvl;
+                        ServerResponse receivedData = JsonUtility.FromJson<ServerResponse>(jsonResponse);
+
+                        //Debug.Log("Parsed Object: " + JsonUtility.ToJson(receivedData, true));
+
+                        CURRENT_CARD_ID = receivedData.user_info.home_card_id;
+
+                        PlayerPrefs.SetString(USER_NAME_KEY, receivedData.user_info.user_name);
+                        PlayerPrefs.SetInt(HOME_CARD_ID_KEY, CURRENT_CARD_ID);
+                        PlayerPrefs.Save();
+
+                        StartCoroutine(WaitForCardLoaderAndDisplay());
+                        UpdateProgress(receivedData.user_info.next_lvl_percent);
+
+                        starsValue.text = (receivedData.user_inventory.paid_gems + receivedData.user_inventory.free_gems).ToString();
+                        coinsValue.text = receivedData.user_inventory.coins.ToString();
+                        levelValue.text = "Level " + receivedData.user_info.user_lvl;
+                    }
+                    else
+                    {
+                        Debug.LogError("Error receiving JSON: " + request.error);
+                    }
                 }
-                else
-                {
-                    Debug.LogError("Error receiving JSON: " + request.error);
-                }
+            } else
+            {
+                Debug.LogError("User ID not found. Cannot send data.");
             }
-        } else
-        {
-            Debug.LogError("User ID not found. Cannot send data.");
         }
-    }
 
     IEnumerator WaitForCardLoaderAndDisplay()
     {
