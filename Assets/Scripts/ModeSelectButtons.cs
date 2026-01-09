@@ -1,34 +1,37 @@
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ModeSelectButtons : MonoBehaviour
 {
-    public int buttonType;
-
-    public void ChangeScene()
+    public void GoToSolo()
     {
-        switch (buttonType)
+        SceneManager.LoadScene("SelectSongScene");
+    }
+
+    public void GoToMulti()
+    {
+        if (!PhotonNetwork.IsConnected)
         {
-            case 1:
-                // Solo Live
-                SceneManager.LoadScene("SelectSongScene");
-                break;
-            case 2:
-                // Multi Live
-                SceneManager.LoadScene("MultiLobby");
-                break;
-            case 3:
-                // Create Room
-                SceneManager.LoadScene("");
-                break;
-            case 4:
-                // Enter Code
-                SceneManager.LoadScene("");
-                break;
-            default:
-                // Home
-                SceneManager.LoadScene("HomeScreen");
-                break;
+            Debug.LogError("Photon is not connected yet!");
+            return;
         }
+
+        // ÑRÑÇÑpÑxÑÖ ÑÅÑuÑÇÑuÑáÑÄÑtÑyÑ} Ñr Ñ|ÑÄÑqÑqÑy-ÑÉÑàÑuÑ~ÑÖ (Ñ~Ñu ÑwÑtÑvÑ} callback)
+        SceneManager.LoadScene("MultiLobby");
+    }
+
+    public void CreateOwnRoom()
+    {
+        // Create Room
+        // POPUP
+        SceneManager.LoadScene("");
+    }
+
+    public void CodeConnectToRoom()
+    {
+        // Enter Code
+        // POPUP
+        SceneManager.LoadScene("");
     }
 }

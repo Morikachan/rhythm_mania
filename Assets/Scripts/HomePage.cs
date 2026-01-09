@@ -83,7 +83,7 @@ public class HomePage : MonoBehaviour
                 byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
 
 
-                using (UnityWebRequest request = UnityWebRequest.Get(receiveUrl))
+                using (UnityWebRequest request = new UnityWebRequest(receiveUrl, "POST"))
                 {
 
                     request.uploadHandler = new UploadHandlerRaw(bodyRaw);

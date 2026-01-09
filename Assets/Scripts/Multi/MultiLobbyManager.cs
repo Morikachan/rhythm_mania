@@ -3,78 +3,61 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using ExitGames.Client.Photon;
+using IEnumerator = System.Collections.IEnumerator;
 
 public class MultiLobbyManager : MonoBehaviourPunCallbacks
 {
     [Header("Room")]
     [SerializeField] private byte maxPlayers = 2;
     [SerializeField] private string songSelectionSceneName = "MultiSelectSongScene";
+    [SerializeField] private float sceneLoadDelay = 2f;
 
     [Header("Player Slots")]
-    [SerializeField] private GameObject player1Panel;
-    [SerializeField] private GameObject player2Panel;
-
     [SerializeField] private Image player1IllustImage;
     [SerializeField] private Image player2IllustImage;
-
     [SerializeField] private TextMeshProUGUI player1UsernameText;
     [SerializeField] private TextMeshProUGUI player2UsernameText;
-
     [SerializeField] private Sprite defaultAvatarSprite;
-
-    [Header("PlayerPrefs keys")]
-    private const string USER_NAME_KEY = "UserName";
-    private const string HOME_CARD_ID_KEY = "HomeCardID";
 
     [Header("Photon CustomProperties keys")]
     private const string PROP_USERNAME = "UserName";
     private const string PROP_CARD_ID = "CardID";
 
+    private Coroutine loadSceneCoroutine;
+
     private void Start()
     {
-        Debug.Log("Start at MultiLobbyManager");
-        PhotonNetwork.AutomaticallySyncScene = true;
+        ResetAllSlots();
 
         if (!PhotonNetwork.IsConnected)
         {
-            PhotonNetwork.GameVersion = "0.0.1";
-            PhotonNetwork.ConnectUsingSettings();
+            Debug.LogError("Photon is NOT connected. MultiLobby expects connection before scene.");
+            return;
+        }
+
+        if (!PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.JoinRandomRoom();
+        }
+        else
+        {
+            UpdateLobbyUI();
         }
     }
 
-    // ~~~~~~~~~~~~~~ PHOTON ~~~~~~~~~~~~~~
-
-    public override void OnConnectedToMaster()
-    {
-        Debug.Log("Connected to Master");
-
-        string userName = PlayerPrefs.GetString(USER_NAME_KEY, "Player");
-        int cardId = PlayerPrefs.GetInt(HOME_CARD_ID_KEY, 1);
-
-        Debug.Log(userName + "+ " + cardId.ToString());
-
-        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
-        {
-            { PROP_USERNAME, userName },
-            { PROP_CARD_ID, cardId }
-        };
-
-        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
-
-        // TODO: To instance or to call it every time when connecting to room
-        PhotonNetwork.JoinRandomRoom();
-    }
+    // PHOTON CALLBACKS
 
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined Room");
         UpdateLobbyUI();
-        TryLoadSongSelection();
+        TryStartSceneTransition();
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("No free rooms, creating new one...");
+        Debug.Log("No free rooms, creating one");
 
         RoomOptions options = new RoomOptions
         {
@@ -88,69 +71,79 @@ public class MultiLobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        Debug.Log($"Player entered: {newPlayer.ActorNumber}");
         UpdateLobbyUI();
-        TryLoadSongSelection();
+        TryStartSceneTransition();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        Debug.Log($"Player left: {otherPlayer.ActorNumber}");
+        UpdateLobbyUI();
+        CancelSceneTransition();
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
         UpdateLobbyUI();
     }
 
-    public void CreateRoom()
-    {
-        RoomOptions options = new RoomOptions
-        {
-            MaxPlayers = maxPlayers,
-            IsVisible = true
-        };
+    // SCENE TRANSITION
 
-        PhotonNetwork.CreateRoom(null, options);
-    }
-
-    public void JoinRoom()
-    {
-        PhotonNetwork.JoinRandomRoom();
-    }
-
-    // ~~~~~~~~~~~~~~ SCENE ~~~~~~~~~~~~~~
-    private void TryLoadSongSelection()
+    private void TryStartSceneTransition()
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
         if (PhotonNetwork.CurrentRoom.PlayerCount == maxPlayers)
         {
-            PhotonNetwork.LoadLevel(songSelectionSceneName);
+            if (loadSceneCoroutine == null)
+            {
+                loadSceneCoroutine = StartCoroutine(LoadSongSelectionWithDelay());
+            }
         }
     }
 
-    // ~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~
+    private void CancelSceneTransition()
+    {
+        if (loadSceneCoroutine != null)
+        {
+            StopCoroutine(loadSceneCoroutine);
+            loadSceneCoroutine = null;
+        }
+    }
 
-    private void UpdateLobbyUI()
+    private IEnumerator LoadSongSelectionWithDelay()
+    {
+        yield return new WaitForSeconds(sceneLoadDelay);
+        PhotonNetwork.LoadLevel(songSelectionSceneName);
+    }
+
+    // UI CHANGES
+
+    private void ResetAllSlots()
     {
         ResetSlot(player1UsernameText, player1IllustImage);
         ResetSlot(player2UsernameText, player2IllustImage);
+    }
 
-        foreach (Player player in PhotonNetwork.PlayerList)
+    private void UpdateLobbyUI()
+    {
+        ResetAllSlots();
+
+        Player[] players = PhotonNetwork.PlayerList;
+
+        for (int i = 0; i < players.Length; i++)
         {
-            if (player.ActorNumber == 1)
-            {
-                FillSlot(player, player1UsernameText, player1IllustImage);
-            }
-            else if (player.ActorNumber == 2)
-            {
-                FillSlot(player, player2UsernameText, player2IllustImage);
-            }
+            if (i == 0)
+                FillSlot(players[i], player1UsernameText, player1IllustImage);
+            else if (i == 1)
+                FillSlot(players[i], player2UsernameText, player2IllustImage);
         }
     }
 
     private void FillSlot(Player player, TextMeshProUGUI nameText, Image avatar)
     {
-        if (player.CustomProperties.TryGetValue(PROP_USERNAME, out object name))
+        if (player.CustomProperties.TryGetValue(PROP_USERNAME, out object username))
         {
-            nameText.text = name.ToString();
+            nameText.text = username.ToString();
         }
 
         if (player.CustomProperties.TryGetValue(PROP_CARD_ID, out object cardId))
