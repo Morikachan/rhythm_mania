@@ -6,8 +6,8 @@ public class SongDataHolder : MonoBehaviour
 
     public string SelectedSongName {  get; private set; }
     public int SelectedSongId { get; private set; }
-
-    //public SongListManager.Song FullSelectedSongData { get; private set; }
+    public int SelectedSongLevel { get; private set; }
+    public int SelectedSongBPM { get; private set; }
 
     private void Awake()
     {
@@ -26,6 +26,7 @@ public class SongDataHolder : MonoBehaviour
     {
         SelectedSongName = song.song_name;
         SelectedSongId = song.song_id;
-        //FullSelectedSongData = song;
+        SelectedSongLevel = song.song_level;
+        SelectedSongBPM = song.song_bpm;
     }
 }
