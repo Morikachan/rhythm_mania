@@ -1,27 +1,27 @@
-using UnityEngine;
 using Photon.Pun;
-using ExitGames.Client.Photon;
+using UnityEngine;
 
 public class SelectButton : MonoBehaviour {
+    public RoomPhaseManager phaseManager;
+
     public void OnClickSelect()
     {
-        if(SongDataHolder.instance == null)
-        {
-            Debug.LogError("SongDataHolder missing");
-            return;
-        }
+        if(SongDataHolder.instance == null) return;
 
         var song = SongDataHolder.instance;
 
-        Hashtable props = new Hashtable
-        {
-            { "SelectState", "Selected" },
-            { "SongID", song.SelectedSongId },
-            { "SongName", song.SelectedSongName },
-            { "SongLevel", song.SelectedSongLevel },
-            { "SongBPM", song.SelectedSongBPM }
-        };
+        ExitGames.Client.Photon.Hashtable props =
+            new ExitGames.Client.Photon.Hashtable
+            {
+                { "SelectState", "Selected" },
+                { "SongID", song.SelectedSongId },
+                { "SongName", song.SelectedSongName },
+                { "SongLevel", song.SelectedSongLevel },
+                { "SongBPM", song.SelectedSongBPM }
+            };
 
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+        phaseManager.ShowRouletteLocally();
     }
 }

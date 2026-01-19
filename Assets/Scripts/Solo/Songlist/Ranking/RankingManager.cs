@@ -52,7 +52,7 @@ public class RankingManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Ranking Button „~„u „„‚„y„r„‘„x„p„~„p „r „y„~„ƒ„„u„{„„„€„‚„u RankingManager!");
+            Debug.LogWarning("Ranking Button RankingManager!");
         }
 
         if (closeRankingButton != null)
@@ -61,7 +61,7 @@ public class RankingManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Ranking Button „~„u „„‚„y„r„‘„x„p„~„p „r „y„~„ƒ„„u„{„„„€„‚„u RankingManager!");
+            Debug.LogWarning("Ranking Button RankingManager!");
         }
     }
 
@@ -72,7 +72,6 @@ public class RankingManager : MonoBehaviour
             Debug.LogError("SongDataHolder instance not found!");
             return;
         }
-
         int currentSongId = SongDataHolder.instance.SelectedSongId;
 
         if (currentSongId != 0)
@@ -95,6 +94,7 @@ public class RankingManager : MonoBehaviour
     public void CloseRanking()
     {
         rankingPanel.SetActive(false);
+        ClearList();
     }
 
     private void ClearList()

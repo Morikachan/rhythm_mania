@@ -1,15 +1,19 @@
-using UnityEngine;
 using Photon.Pun;
-using ExitGames.Client.Photon;
+using UnityEngine;
 
 public class RecommendButton : MonoBehaviour {
+    public RoomPhaseManager phaseManager;
+
     public void OnClickRecommend()
     {
-        Hashtable props = new Hashtable
-        {
-            { "SelectState", "Recommend" }
-        };
+        ExitGames.Client.Photon.Hashtable props =
+            new ExitGames.Client.Photon.Hashtable
+            {
+                { "SelectState", "Recommend" }
+            };
 
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+        phaseManager.ShowRouletteLocally();
     }
 }

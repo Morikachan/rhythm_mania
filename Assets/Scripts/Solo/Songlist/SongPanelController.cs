@@ -23,7 +23,6 @@ public class SongPanelController : MonoBehaviour
 
         if (backgroundImage != null)
         {
-            // Now it's safe to use the reference
             defaultColor = backgroundImage.color;
         }
 

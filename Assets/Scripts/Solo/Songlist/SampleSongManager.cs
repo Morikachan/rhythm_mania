@@ -7,15 +7,27 @@ public class SampleSongManager : MonoBehaviour
     void Awake()
     {
         audioSource = GetComponent<AudioSource>();
+        if(audioSource == null)
+        {
+            Debug.LogWarning("AudioSource missing, adding automatically");
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     public void PlayMusic(string songName)
     {
-        audioSource.clip = Resources.Load<AudioClip>("Musics/" + songName);
+        if(audioSource == null)
+            return;
 
-        if (audioSource.clip)
+        AudioClip clip = Resources.Load<AudioClip>("Musics/" + songName);
+
+        if(clip == null)
         {
-            audioSource.Play();
+            Debug.LogWarning($"Music not found: {songName}");
+            return;
         }
+
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 }

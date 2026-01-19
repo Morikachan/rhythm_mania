@@ -41,6 +41,9 @@ MonoBehaviour:
   - RespawnSpaceship
   - StartRoulette
   - GoPreparation
+  - RPC_GoPreparation
+  - RPC_ShowWinner
+  - RPC_StopMusic
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1
