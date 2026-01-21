@@ -89,11 +89,24 @@ public class MusicManager : MonoBehaviour
         }
     }
 
+    public float GetMusicTime()
+    {
+        return audioSource.time;
+    }
+
     IEnumerator EndGame()
     {
         finishText.SetActive(true);
         yield return new WaitForSeconds(1);
 
         SceneManager.LoadScene("ResultScene");
+    }
+
+    IEnumerator MultiEndGame()
+    {
+        finishText.SetActive(true);
+        yield return new WaitForSeconds(1);
+
+        MultiGameManager.instance.EndGame();
     }
 }
