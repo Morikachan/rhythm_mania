@@ -19,6 +19,8 @@ public class SongListManager : MonoBehaviour
 
     private SongPanelController currentSelectedPanel;
     public SampleSongManager sampleSongManager;
+    // RankingManager exists only in Solo scenes
+    public RankingManager rankingManager;
 
     private const string USER_ID_KEY = "UserID";
 
@@ -120,6 +122,11 @@ public class SongListManager : MonoBehaviour
         DisplaySongIllust(song.song_id);
 
         sampleSongManager.PlayMusic(song.song_name);
+
+        if (rankingManager != null)
+        {
+            rankingManager.RefreshRanking();
+        }
     }
 
     public void DisplaySongIllust(int songId)

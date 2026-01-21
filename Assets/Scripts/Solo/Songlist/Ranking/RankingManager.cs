@@ -12,6 +12,9 @@ public class RankingManager : MonoBehaviour
     public GameObject rankingPanel;
     public Transform contentParent;
     public GameObject rankingUserPrefab;
+    public GameObject noRankingPrefab;
+
+    private GameObject noRankingInstance;
 
     public Button openRankingButton;
     public Button closeRankingButton;
@@ -63,6 +66,8 @@ public class RankingManager : MonoBehaviour
         {
             Debug.LogWarning("Ranking Button RankingManager!");
         }
+
+        CreateNoRankingItem();
     }
 
     public void OnRankingButtonClicked()
@@ -76,6 +81,7 @@ public class RankingManager : MonoBehaviour
 
         if (currentSongId != 0)
         {
+            GameObject noRankingObject = Instantiate(rankingUserPrefab, contentParent);
             OpenRanking(currentSongId);
         }
         else
@@ -97,12 +103,26 @@ public class RankingManager : MonoBehaviour
         ClearList();
     }
 
+    void CreateNoRankingItem()
+    {
+        if (noRankingPrefab == null) return;
+
+        noRankingInstance = Instantiate(noRankingPrefab, contentParent);
+        noRankingInstance.SetActive(false);
+    }
+
     private void ClearList()
     {
         foreach (Transform child in contentParent)
         {
+            if (noRankingInstance != null && child.gameObject == noRankingInstance)
+                continue;
+
             Destroy(child.gameObject);
         }
+
+        if (noRankingInstance != null)
+            noRankingInstance.SetActive(false);
     }
 
     private async Task GetRankingData(int songId)
@@ -132,7 +152,15 @@ public class RankingManager : MonoBehaviour
 
                     if (response != null && response.status == "success")
                     {
-                        CreateRankingList(response.ranking);
+                        if (response.ranking == null || response.ranking.Count == 0)
+                        {
+                            ShowNoRanking();
+                        }
+                        else
+                        {
+                            HideNoRanking();
+                            CreateRankingList(response.ranking);
+                        }
                     }
                     else
                     {
@@ -170,6 +198,44 @@ public class RankingManager : MonoBehaviour
                     user.home_card_id
                 );
             }
+        }
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(
+            contentParent.GetComponent<RectTransform>()
+        );
+    }
+
+    void ShowNoRanking()
+    {
+        if (noRankingInstance != null)
+            noRankingInstance.SetActive(true);
+    }
+
+    void HideNoRanking()
+    {
+        if (noRankingInstance != null)
+            noRankingInstance.SetActive(false);
+    }
+
+    public async void RefreshRanking()
+    {
+        if (SongDataHolder.instance == null) return;
+
+        int songId = SongDataHolder.instance.SelectedSongId;
+        if (songId == 0) return;
+
+        ClearList();
+        await GetRankingData(songId);
+
+        ResetScrollPosition();
+    }
+
+    private void ResetScrollPosition()
+    {
+        RectTransform rt = contentParent.GetComponent<RectTransform>();
+        if (rt != null)
+        {
+            rt.anchoredPosition = Vector2.zero;
         }
     }
 }

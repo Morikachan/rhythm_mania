@@ -304,6 +304,7 @@ MonoBehaviour:
   rankingPanel: {fileID: 785387548}
   contentParent: {fileID: 1888294344}
   rankingUserPrefab: {fileID: 7402580701216858617, guid: f50087a8ed927c94fa78c796cb6097f3, type: 3}
+  noRankingPrefab: {fileID: 1797244168024607851, guid: 5c3d9ac9305fb5d49982a493c0a3060d, type: 3}
   openRankingButton: {fileID: 1160706855}
   closeRankingButton: {fileID: 386572868}
   receiveUrl: http://localhost/rhythm_mania/Database/get-song-ranking.php
@@ -3611,6 +3612,7 @@ MonoBehaviour:
   infoSongCombo: {fileID: 1928123085}
   infoSongScore: {fileID: 336885912}
   sampleSongManager: {fileID: 1686502904}
+  rankingManager: {fileID: 232418236}
   receiveUrl: http://localhost/rhythm_mania/Database/get-songlist.php
 --- !u!114 &1962668282
 MonoBehaviour:

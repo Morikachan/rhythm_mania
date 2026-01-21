@@ -1,10 +1,10 @@
 <?php
 require_once './core/Database.php';
 
-// if ($_SERVER["REQUEST_METHOD"] !== "GET") {
-//     http_response_code(405);
-//     exit;
-// }
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    http_response_code(405);
+    exit;
+}
 
 function getSongRanking($pdo, $song_id)
 {
@@ -44,13 +44,12 @@ function getSongRanking($pdo, $song_id)
     $body = file_get_contents('php://input');
     $data = json_decode($body, true);
 
-    // if (!$data || !isset($data['song_id'])) {
-    //     echo json_encode(['status' => 'error', 'message' => 'Invalid JSON or missing song_id']);
-    //     exit;
-    // }
+    if (!$data || !isset($data['song_id'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid JSON or missing song_id']);
+        exit;
+    }
 
-    // $song_id = $data['song_id'];
-    $song_id = 2;
+    $song_id = $data['song_id'];
 
     $ranking_list = getSongRanking($pdo, $song_id);
 
@@ -69,7 +68,7 @@ function getSongRanking($pdo, $song_id)
     } else {
         echo json_encode([
             'status'  => 'success',
-            'message' => 'Ranking obtaining error success.',
+            'message' => 'Ranking obtaining success.',
             'ranking' => $ranking_list
         ], JSON_UNESCAPED_UNICODE);
     }
