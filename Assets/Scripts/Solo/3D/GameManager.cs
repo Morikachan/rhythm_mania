@@ -2,7 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, INoteSpeedProvider
 {
     public static GameManager instance = null;
 
@@ -80,7 +80,10 @@ public class GameManager : MonoBehaviour
 
         notesManager.StartGame();
     }
-
+    public float GetNoteSpeed()
+    {
+        return noteSpeed;
+    }
 
     public void GameOver()
     {

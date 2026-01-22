@@ -9,7 +9,7 @@ public class MultiLongNote : MonoBehaviour {
 
     [Header("Refs")]
     private MultiJudge judge;
-    private NotesManager notes;
+    private MultiNotesManager notes;
     private MultiGameManager gm;
 
     [Header("Parts")]
@@ -42,7 +42,7 @@ public class MultiLongNote : MonoBehaviour {
         float end,
         float judgeZ,
         float spawnOffset,
-        NotesManager nm,
+        MultiNotesManager nm,
         MultiJudge j)
     {
         this.lane = lane;

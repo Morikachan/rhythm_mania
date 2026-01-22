@@ -2,14 +2,34 @@ using UnityEngine;
 
 public class Notes : MonoBehaviour
 {
-    float NoteSpeed = 5;
+    private INoteSpeedProvider speedProvider;
+    private float noteSpeed;
 
-    void Start()
+    void Awake()
     {
-        NoteSpeed = GameManager.instance.noteSpeed;
+        TryFindProvider();
     }
+
+    void TryFindProvider()
+    {
+        var all = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var mb in all)
+        {
+            if (mb is INoteSpeedProvider provider)
+            {
+                speedProvider = provider;
+                noteSpeed = provider.GetNoteSpeed();
+                return;
+            }
+        }
+
+        Debug.LogError("INoteSpeedProvider not found on scene!");
+    }
+
     void Update()
     {
-        transform.position -= transform.forward * Time.deltaTime * NoteSpeed;
+        if (speedProvider == null) return;
+
+        transform.position -= transform.forward * Time.deltaTime * noteSpeed;
     }
 }

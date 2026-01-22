@@ -100,6 +100,17 @@ public class MultiJudge : MonoBehaviour
         );
     }
 
+    public void OnMiss()
+    {
+        int actor = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        MultiGameManager.instance.players[actor].miss++;
+        MultiGameManager.instance.ResetCombo(actor);
+        MultiGameManager.instance.Damage(actor, 100);
+
+        ShowMissEffect();
+    }
+
     public void ShowMissEffect()
     {
         if(MessageObj.Length > 3 && MessageObj[3] != null)

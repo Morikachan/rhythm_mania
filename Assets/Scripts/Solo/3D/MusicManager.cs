@@ -8,6 +8,8 @@ public class MusicManager : MonoBehaviour
     public AudioSource audioSource;
     public bool played = false;
 
+    public bool isMulti = false;
+
     public GameObject finishText;
 
     void Awake()
@@ -99,14 +101,9 @@ public class MusicManager : MonoBehaviour
         finishText.SetActive(true);
         yield return new WaitForSeconds(1);
 
-        SceneManager.LoadScene("ResultScene");
-    }
-
-    IEnumerator MultiEndGame()
-    {
-        finishText.SetActive(true);
-        yield return new WaitForSeconds(1);
-
-        MultiGameManager.instance.EndGame();
+        if (isMulti)
+            MultiGameManager.instance.EndGame();
+        else
+            SceneManager.LoadScene("ResultScene");
     }
 }

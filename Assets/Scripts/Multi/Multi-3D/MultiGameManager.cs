@@ -4,8 +4,10 @@ using Photon.Realtime;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
-public class MultiGameManager : MonoBehaviourPunCallbacks {
+public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
+{
     public static MultiGameManager instance;
 
     [Header("Players")]
@@ -30,7 +32,7 @@ public class MultiGameManager : MonoBehaviourPunCallbacks {
     [Header("References")]
     [SerializeField] public TextMeshProUGUI comboText;
     [SerializeField] public TextMeshProUGUI scoreText;
-    public NotesManager notesManager;
+    public MultiNotesManager notesManager;
     public MusicManager musicManager;
 
     public GameObject keyLine;
@@ -42,7 +44,32 @@ public class MultiGameManager : MonoBehaviourPunCallbacks {
 
     void Start()
     {
+        Debug.Log("MultiGameManager started");
         InitPlayers();
+
+        StartCoroutine(StartGameAfterDelay());
+    }
+
+    public float GetNoteSpeed()
+    {
+        return noteSpeed;
+    }
+
+    IEnumerator StartGameAfterDelay()
+    {
+        yield return new WaitForSeconds(startDelay);
+
+        if (keyLine != null)
+            keyLine.SetActive(false);
+
+        musicManager.ResetMusic();
+
+        float musicDelay = notesManager.spawnOffset / noteSpeed;
+        musicManager.PlayMusic(musicDelay);
+
+        notesManager.StartGame();
+
+        Debug.Log("MULTI GAME STARTED");
     }
 
     void InitPlayers()
