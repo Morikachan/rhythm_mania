@@ -70,7 +70,7 @@ public class MultiLongNote : MonoBehaviour {
         if(completed || !gm.musicManager.played)
             return;
 
-        float songTime = gm.musicManager.GetMusicTime();
+        float songTime = Time.time - gm.startTime;
 
         float zStart = judgeZ + (startTime - songTime) * speed + spawnOffset;
         float zEnd = judgeZ + (endTime - songTime) * speed + spawnOffset;
@@ -101,6 +101,7 @@ public class MultiLongNote : MonoBehaviour {
         {
             length = zEnd - zStart;
             if(length <= 0) return;
+
             transform.position = new Vector3(LaneToX(lane), 0.5f, zStart);
         }
         else
@@ -109,8 +110,9 @@ public class MultiLongNote : MonoBehaviour {
             transform.position = new Vector3(LaneToX(lane), 0.5f, judgeZ);
         }
 
-        bodyPart.localScale = new Vector3(1, 1, length);
+        bodyPart.localScale = new Vector3(1, 0.01f, length);
         bodyPart.localPosition = new Vector3(0, 0, length * 0.5f);
+
         endPart.localPosition = new Vector3(0, 0, length + visualEndGap);
     }
 

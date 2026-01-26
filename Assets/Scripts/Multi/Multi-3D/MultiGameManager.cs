@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.Audio;
 
 public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 {
@@ -28,6 +29,7 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
     [Header("Game Settings")]
     public float noteSpeed = 5f;
     public float startDelay = 2f; // Delay before start
+    public float startTime;
 
     [Header("References")]
     [SerializeField] public TextMeshProUGUI comboText;
@@ -62,14 +64,14 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
         if (keyLine != null)
             keyLine.SetActive(false);
 
+        startTime = Time.time;
+
         musicManager.ResetMusic();
 
         float musicDelay = notesManager.spawnOffset / noteSpeed;
         musicManager.PlayMusic(musicDelay);
 
         notesManager.StartGame();
-
-        Debug.Log("MULTI GAME STARTED");
     }
 
     void InitPlayers()

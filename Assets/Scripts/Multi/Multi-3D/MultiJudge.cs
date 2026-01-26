@@ -1,15 +1,16 @@
 using Photon.Pun;
 using UnityEngine;
+using static MultiNotesManager;
 
 public class MultiJudge : MonoBehaviour
 {
-    [SerializeField] private GameObject[] MessageObj;
-    [SerializeField] private NotesManager notesManager;
+    [SerializeField] private GameObject[] messageObj;
     [SerializeField] private AudioClip hitSound;
 
     private AudioSource audioSource;
-    private const float judgeZ = 0f;
+    private MultiNotesManager notesManager;
 
+    private const float judgeZ = 0f;
     private int localActor;
 
     public enum JudgeType { Perfect = 0, Great = 1, Bad = 2, Miss = 3 }
@@ -18,86 +19,55 @@ public class MultiJudge : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
         localActor = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        notesManager = FindObjectOfType<MultiNotesManager>();
+        if(!notesManager)
+            Debug.LogError("MultiNotesManager NOT FOUND");
     }
 
     void Update()
     {
         if(!MultiGameManager.instance) return;
+        if(!MultiGameManager.instance.musicManager) return;
         if(!MultiGameManager.instance.musicManager.played) return;
-        if(notesManager.NotesObj.Count == 0) return;
+        if(!notesManager) return;
 
-        if(Input.GetKeyDown(KeyCode.D)) CheckHit(0);
-        if(Input.GetKeyDown(KeyCode.F)) CheckHit(1);
-        if(Input.GetKeyDown(KeyCode.J)) CheckHit(2);
-        if(Input.GetKeyDown(KeyCode.K)) CheckHit(3);
+        if(Input.GetKeyDown(KeyCode.D)) TryHit(0);
+        if(Input.GetKeyDown(KeyCode.F)) TryHit(1);
+        if(Input.GetKeyDown(KeyCode.J)) TryHit(2);
+        if(Input.GetKeyDown(KeyCode.K)) TryHit(3);
     }
 
-    void CheckHit(int lane)
+    void TryHit(int lane)
     {
-        for(int i = 0; i < notesManager.NotesObj.Count; i++)
+        NoteHitResult result = notesManager.TryHitNote(lane, judgeZ);
+
+        if(!result.hit)
+            return;
+
+        if(hitSound)
+            audioSource.PlayOneShot(hitSound);
+
+        switch(result.type)
         {
-            if(notesManager.LaneNum[i] != lane)
-                continue;
-
-            GameObject note = notesManager.NotesObj[i];
-            float distance = Mathf.Abs(note.transform.position.z - judgeZ);
-
-            if(distance <= 0.6f)
-                audioSource.PlayOneShot(hitSound);
-
-            if(note.GetComponent<LongNote>() != null)
-                return;
-
-            //  PERFECT 
-            if(distance <= 0.2f)
-            {
-                ShowJudge(JudgeType.Perfect);
-
+            case JudgeType.Perfect:
                 MultiGameManager.instance.players[localActor].perfect++;
                 MultiGameManager.instance.AddScore(localActor, 1000);
+                break;
 
-                DeleteNote(i);
-                return;
-            }
-            //  GREAT 
-            else if(distance <= 0.4f)
-            {
-                ShowJudge(JudgeType.Great);
-
+            case JudgeType.Great:
                 MultiGameManager.instance.players[localActor].great++;
                 MultiGameManager.instance.AddScore(localActor, 700);
+                break;
 
-                DeleteNote(i);
-                return;
-            }
-            //  BAD 
-            else if(distance <= 0.6f)
-            {
-                ShowJudge(JudgeType.Bad);
-
+            case JudgeType.Bad:
                 MultiGameManager.instance.players[localActor].bad++;
                 MultiGameManager.instance.ResetCombo(localActor);
                 MultiGameManager.instance.Damage(localActor, 50);
-
-                DeleteNote(i);
-                return;
-            }
+                break;
         }
-    }
 
-    void DeleteNote(int index)
-    {
-        Destroy(notesManager.NotesObj[index]);
-        notesManager.RemoveNoteData(index);
-    }
-
-    public void ShowJudge(JudgeType type)
-    {
-        Instantiate(
-            MessageObj[(int)type],
-            new Vector3(0, 0.8f, judgeZ),
-            Quaternion.identity
-        );
+        ShowJudge(result.type);
     }
 
     public void OnMiss()
@@ -111,12 +81,21 @@ public class MultiJudge : MonoBehaviour
         ShowMissEffect();
     }
 
+    public void ShowJudge(JudgeType type)
+    {
+        Instantiate(
+            messageObj[(int)type],
+            new Vector3(0, 0.8f, judgeZ),
+            Quaternion.identity
+        );
+    }
+
     public void ShowMissEffect()
     {
-        if(MessageObj.Length > 3 && MessageObj[3] != null)
+        if(messageObj.Length > 3 && messageObj[3] != null)
         {
             Instantiate(
-                MessageObj[3],
+                messageObj[3],
                 new Vector3(0, 0.8f, judgeZ),
                 Quaternion.identity
             );
