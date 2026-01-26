@@ -57,7 +57,8 @@ public class HomePage : MonoBehaviour
         public int coins;
     };
 
-    public string receiveUrl = "http://localhost/rhythm_mania/Database/user-home-info.php";
+    // public string receiveUrl = "http://localhost/rhythm_mania/Database/user-home-info.php";
+    public string receiveUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/user-home-info.php";
 
     void Start()
     {
@@ -89,8 +90,20 @@ public class HomePage : MonoBehaviour
                     request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                     request.downloadHandler = new DownloadHandlerBuffer();
                     request.SetRequestHeader("Content-Type", "application/json");
+                    request.SetRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
 
+                //await request.SendWebRequest();
+
+                try
+                {
+                    // ÑGÑtÑuÑ} ÑrÑçÑÅÑÄÑ|Ñ~ÑuÑ~ÑyÑë
                     await request.SendWebRequest();
+                } catch (System.Exception e)
+                {
+                    Debug.LogError("ÑRÑIÑRÑSÑEÑMÑNÑ@Ñ` ÑOÑYÑIÑAÑKÑ@: " + e.Message);
+                    return;
+                }
+                Debug.Log(JsonUtility.ToJson(request, true));
 
                     if (request.result == UnityWebRequest.Result.Success)
                     {
@@ -115,7 +128,7 @@ public class HomePage : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError("Error receiving JSON: " + request.error);
+                        Debug.LogError("UnityWebRequest Error: " + request.error);
                     }
                 }
             } else
