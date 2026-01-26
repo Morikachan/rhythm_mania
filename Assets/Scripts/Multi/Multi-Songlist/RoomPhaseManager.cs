@@ -7,11 +7,18 @@ using System.Collections;
 using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 using static SongListManager;
 using System;
+using System.Collections.Generic;
 
 public enum RoomPhase {
     SongList,
     Roulette,
     Preparation
+}
+
+enum SelectResultType {
+    TwoSelected,
+    OneSelectedOneRecommend,
+    TwoRecommend
 }
 
 public class RoomPhaseManager : MonoBehaviourPunCallbacks {
@@ -56,11 +63,17 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
     public TextMeshProUGUI songBPM;
     public Image songIllust;
 
+    [Header("All Songs")]
+    public List<string> allSongNames;
+
     [Header("Colors")]
     public Color readyPink;
 
     private RoomPhase currentPhase = RoomPhase.SongList;
     private SampleSongManager songManager;
+
+    [Header("Song Source")]
+    public SongListManager songListManager;
 
     private const string PROP_USERNAME = "UserName";
     private const string PROP_CARD_ID = "CardID";
@@ -142,20 +155,79 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         if(currentPhase == RoomPhase.Preparation)
             RefreshPreparationUI();
 
+        //if(currentPhase == RoomPhase.SongList && AllPlayersSelected())
+        //{
+        //    SetPhase(RoomPhase.Roulette);
+        //    ShowRouletteLocally();
+
+        //    if(PhotonNetwork.IsMasterClient)
+        //        StartCoroutine(RouletteFlow());
+        //}
+
         if(currentPhase == RoomPhase.SongList && AllPlayersSelected())
         {
             SetPhase(RoomPhase.Roulette);
             ShowRouletteLocally();
 
-            if(PhotonNetwork.IsMasterClient)
-                StartCoroutine(RouletteFlow());
+            if(!PhotonNetwork.IsMasterClient)
+                return;
+
+            Player selectedPlayer;
+            SelectResultType result = GetSelectResult(out selectedPlayer);
+
+            switch(result)
+            {
+                case SelectResultType.TwoSelected:
+                    StartCoroutine(RouletteFlow());
+                    break;
+
+                case SelectResultType.OneSelectedOneRecommend:
+                    StartCoroutine(DirectWinnerFlow(selectedPlayer));
+                    break;
+
+                case SelectResultType.TwoRecommend:
+                    StartCoroutine(RandomFromAllSongsFlow());
+                    break;
+            }
         }
 
         if(currentPhase == RoomPhase.Preparation && AllPlayersReady())
             StartCoroutine(ChangeToGameSceneWithDalay());
     }
 
-    //  ROULETTE FLOW 
+    //  ROULETTE FLOW
+
+    SelectResultType GetSelectResult(out Player selectedPlayer)
+    {
+        selectedPlayer = null;
+
+        Player[] players = PhotonNetwork.PlayerList;
+        if(players.Length < 2)
+            return SelectResultType.TwoRecommend;
+
+        int selectedCount = 0;
+        int recommendCount = 0;
+
+        foreach(var p in players)
+        {
+            string state = p.CustomProperties["SelectState"].ToString();
+            if(state == "Selected")
+            {
+                selectedCount++;
+                selectedPlayer = p;
+            }
+            else if(state == "Recommend")
+                recommendCount++;
+        }
+
+        if(selectedCount == 2)
+            return SelectResultType.TwoSelected;
+
+        if(selectedCount == 1 && recommendCount == 1)
+            return SelectResultType.OneSelectedOneRecommend;
+
+        return SelectResultType.TwoRecommend;
+    }
 
     IEnumerator RouletteFlow()
     {
@@ -206,6 +278,62 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
             level,
             bpm,
             songID
+        );
+
+        yield return new WaitForSeconds(2f);
+        photonView.RPC(nameof(RPC_GoPreparation), RpcTarget.All);
+    }
+
+    IEnumerator DirectWinnerFlow(Player winner)
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        photonView.RPC(nameof(RPC_StopMusic), RpcTarget.All);
+
+        yield return new WaitForSeconds(0.5f);
+
+        int winnerIndex = Array.IndexOf(PhotonNetwork.PlayerList, winner);
+
+        photonView.RPC(
+            nameof(RPC_ShowWinner),
+            RpcTarget.All,
+            winnerIndex,
+            winner.CustomProperties["SongName"].ToString(),
+            winner.CustomProperties["SongLevel"].ToString(),
+            winner.CustomProperties["SongBPM"].ToString(),
+            Int32.Parse(winner.CustomProperties["SongID"].ToString())
+        );
+
+        yield return new WaitForSeconds(2f);
+        photonView.RPC(nameof(RPC_GoPreparation), RpcTarget.All);
+    }
+
+    IEnumerator RandomFromAllSongsFlow()
+    {
+        yield return new WaitForSeconds(1f);
+
+        photonView.RPC(nameof(RPC_StopMusic), RpcTarget.All);
+
+        yield return new WaitForSeconds(0.5f);
+
+        List<Song> allSongs = songListManager.GetAllSongs();
+
+        if(allSongs == null || allSongs.Count == 0)
+            yield break;
+
+        //Song randomSong = allSongs[UnityEngine.Random.Range(0, allSongs.Count)];
+        // TEST: ONLY 2 songs
+        int max = Mathf.Min(2, allSongs.Count);
+        Song randomSong = allSongs[UnityEngine.Random.Range(0, max)];
+
+        photonView.RPC(
+            nameof(RPC_ShowWinner),
+            RpcTarget.All,
+            -1, // not player
+            randomSong.song_name,
+            randomSong.song_level.ToString(),
+            randomSong.song_bpm.ToString(),
+            randomSong.song_id
         );
 
         yield return new WaitForSeconds(2f);

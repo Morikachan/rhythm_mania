@@ -1,8 +1,10 @@
 <?php
-
 require_once './Database.php';
 
-session_start();
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    http_response_code(405);
+    exit;
+}
 
 function selectUserCards($pdo, $user_id)
 {
@@ -36,10 +38,37 @@ function selectUserCards($pdo, $user_id)
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $pdo = Database::getInstance()->getPDO();
-    $user_id = $_SESSION['user']['user_id'];
-    $cardList = selectUserCards($pdo, $user_id);
-    echo $cardList ? json_encode(['status' => true, 'cardList' => $cardList]) : json_encode(['status' => false]);
-    exit();
+
+$pdo = Database::getInstance()->getPDO();
+
+$body = file_get_contents('php://input');
+$data = json_decode($body, true);
+
+if (!$data || !isset($data['user_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid JSON or missing song_id']);
+    exit;
+}
+
+$user_id = $data['user_id'];
+
+$card_list = selectUserCards($pdo, $user_id);
+
+if ($card_list === false) {
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Getting cards error.',
+        'cardlist' => []
+    ], JSON_UNESCAPED_UNICODE);
+} elseif (empty($card_list)) {
+    echo json_encode([
+        'status'  => 'success',
+        'message' => 'No cards yet.',
+        'cardlist' => []
+    ], JSON_UNESCAPED_UNICODE);
+} else {
+    echo json_encode([
+        'status'  => 'success',
+        'message' => 'Cards obtaining success.',
+        'cardlist' => $card_list,
+    ], JSON_UNESCAPED_UNICODE);
 }

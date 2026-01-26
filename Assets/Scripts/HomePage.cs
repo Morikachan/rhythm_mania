@@ -57,85 +57,84 @@ public class HomePage : MonoBehaviour
         public int coins;
     };
 
-    // public string receiveUrl = "http://localhost/rhythm_mania/Database/user-home-info.php";
-    public string receiveUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/user-home-info.php";
+     public string receiveUrl = "http://localhost/rhythm_mania/Database/user-home-info.php";
 
     void Start()
     {
         GetJsonData();
     }
 
+    async void GetJsonData()
+    {
+        UserData dataToSend = null;
 
-        async void GetJsonData()
+        if(PlayerPrefs.HasKey(USER_ID_KEY))
         {
-            UserData dataToSend = null;
-
-            if (PlayerPrefs.HasKey(USER_ID_KEY))
+            dataToSend = new UserData
             {
-                dataToSend = new UserData
-                {
-                    user_id = PlayerPrefs.GetString(USER_ID_KEY),
-                };
+                user_id = PlayerPrefs.GetString(USER_ID_KEY),
             };
+        };
 
-            if (dataToSend != null)
+        if(dataToSend != null)
+        {
+            string jsonString = JsonUtility.ToJson(dataToSend);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
+
+
+            using(UnityWebRequest request = new UnityWebRequest(receiveUrl, "POST"))
             {
-                string jsonString = JsonUtility.ToJson(dataToSend);
-                byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
 
-
-                using (UnityWebRequest request = new UnityWebRequest(receiveUrl, "POST"))
-                {
-
-                    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                    request.downloadHandler = new DownloadHandlerBuffer();
-                    request.SetRequestHeader("Content-Type", "application/json");
-                    request.SetRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
 
                 //await request.SendWebRequest();
 
                 try
                 {
-                    // ÑGÑtÑuÑ} ÑrÑçÑÅÑÄÑ|Ñ~ÑuÑ~ÑyÑë
                     await request.SendWebRequest();
-                } catch (System.Exception e)
+                }
+                catch(System.Exception e)
                 {
-                    Debug.LogError("ÑRÑIÑRÑSÑEÑMÑNÑ@Ñ` ÑOÑYÑIÑAÑKÑ@: " + e.Message);
+                    Debug.LogError("SYSTEM ERROR: " + e.Message);
                     return;
                 }
-                Debug.Log(JsonUtility.ToJson(request, true));
+                //Debug.Log("HTTP Status: " + request.responseCode);
+                //Debug.Log("Raw response: " + request.downloadHandler.text);
 
-                    if (request.result == UnityWebRequest.Result.Success)
-                    {
-                        string jsonResponse = request.downloadHandler.text;
+                if(request.result == UnityWebRequest.Result.Success)
+                {
+                    string jsonResponse = request.downloadHandler.text;
 
-                        ServerResponse receivedData = JsonUtility.FromJson<ServerResponse>(jsonResponse);
+                    ServerResponse receivedData = JsonUtility.FromJson<ServerResponse>(jsonResponse);
 
-                        //Debug.Log("Parsed Object: " + JsonUtility.ToJson(receivedData, true));
+                    //Debug.Log("Parsed Object: " + JsonUtility.ToJson(receivedData, true));
 
-                        CURRENT_CARD_ID = receivedData.user_info.home_card_id;
+                    CURRENT_CARD_ID = receivedData.user_info.home_card_id;
 
-                        PlayerPrefs.SetString(USER_NAME_KEY, receivedData.user_info.user_name);
-                        PlayerPrefs.SetInt(HOME_CARD_ID_KEY, CURRENT_CARD_ID);
-                        PlayerPrefs.Save();
+                    PlayerPrefs.SetString(USER_NAME_KEY, receivedData.user_info.user_name);
+                    PlayerPrefs.SetInt(HOME_CARD_ID_KEY, CURRENT_CARD_ID);
+                    PlayerPrefs.Save();
 
-                        StartCoroutine(WaitForCardLoaderAndDisplay());
-                        UpdateProgress(receivedData.user_info.next_lvl_percent);
+                    StartCoroutine(WaitForCardLoaderAndDisplay());
+                    UpdateProgress(receivedData.user_info.next_lvl_percent);
 
-                        starsValue.text = (receivedData.user_inventory.paid_gems + receivedData.user_inventory.free_gems).ToString();
-                        coinsValue.text = receivedData.user_inventory.coins.ToString();
-                        levelValue.text = "Level " + receivedData.user_info.user_lvl;
-                    }
-                    else
-                    {
-                        Debug.LogError("UnityWebRequest Error: " + request.error);
-                    }
+                    starsValue.text = (receivedData.user_inventory.paid_gems + receivedData.user_inventory.free_gems).ToString();
+                    coinsValue.text = receivedData.user_inventory.coins.ToString();
+                    levelValue.text = "Level " + receivedData.user_info.user_lvl;
                 }
-            } else
-            {
-                Debug.LogError("User ID not found. Cannot send data.");
+                else
+                {
+                    Debug.LogError("UnityWebRequest Error: " + request.error);
+                }
             }
         }
+        else
+        {
+            Debug.LogError("User ID not found. Cannot send data.");
+        }
+    }
 
     IEnumerator WaitForCardLoaderAndDisplay()
     {

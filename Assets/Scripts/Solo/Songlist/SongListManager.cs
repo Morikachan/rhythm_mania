@@ -51,6 +51,8 @@ public class SongListManager : MonoBehaviour
         public string best_combo;
     };
 
+    private List<Song> cachedSongs = new List<Song>();
+
     void Awake()
     {
         GetJsonData();
@@ -139,6 +141,8 @@ public class SongListManager : MonoBehaviour
 
     private void CreateSongPanels(List<Song> songs)
     {
+        cachedSongs = songs;
+
         if (songPanelPrefab == null || contentParent == null)
         {
             Debug.LogError("Prefab or Content Parent not assigned in SongListManager");
@@ -172,5 +176,10 @@ public class SongListManager : MonoBehaviour
                 SelectSong(firstPanelController, firstSongData);
             }
         }
+    }
+
+    public List<Song> GetAllSongs()
+    {
+        return cachedSongs;
     }
 }

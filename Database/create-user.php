@@ -40,10 +40,10 @@ function selectUserData($pdo, $user_id)
     }
 }
 
-function createUser($pdo, $id, $password, $username, $registrationDate)
+function createUser($pdo, $id, $password, $email, $username, $registrationDate)
 {
-    $sql = "INSERT INTO users_info (user_id, password, username, registration_date, user_exp) 
-    VALUES (:user_id, :password, :username, :registration_date, :user_exp)";
+    $sql = "INSERT INTO users_info (user_id, password, email, username, registration_date, user_exp) 
+    VALUES (:user_id, :password, :email, :username, :registration_date, :user_exp)";
     try {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
         $userExpDefault = 0;
@@ -51,6 +51,7 @@ function createUser($pdo, $id, $password, $username, $registrationDate)
         $smtp = $pdo->prepare($sql);
         $smtp->bindParam(':user_id', $id);
         $smtp->bindParam(':password', $passwordHash);
+        $smtp->bindParam(':email', $email);
         $smtp->bindParam(':username', $username);
         $smtp->bindParam(':registration_date', $registrationDate);
         $smtp->bindParam(':user_exp', $userExpDefault);
@@ -114,12 +115,13 @@ $pdo = Database::getInstance()->getPDO();
 $body = file_get_contents('php://input');
 $data = json_decode($body, true);
 
-if (!$data || !isset($data['username'], $data['password'])) {
+if (!$data || !isset($data['username'], $data['email'], $data['password'])) {
     echo json_encode(['status' => 'error', 'message' => 'Invalid JSON']);
     exit;
 }
 
 $username = $data['username'];
+$email = $data['email'];
 $password = $data['password'];
 
 date_default_timezone_set('Asia/Tokyo');
@@ -131,7 +133,7 @@ while (searchID($pdo, $random_id)) {
     $random_id = generateSecureRandomString(6);
 }
 
-$result = createUser($pdo, $random_id, $password, $username, $formattedRegistrationDate);
+$result = createUser($pdo, $random_id, $password, $email, $username, $formattedRegistrationDate);
 if ($result) {
     // create user inventory for 4 cards R from id 1 to 4
     // add to home char with 1-st id

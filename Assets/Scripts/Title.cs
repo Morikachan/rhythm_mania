@@ -14,11 +14,13 @@ public class Title : MonoBehaviour {
     [SerializeField] GameObject createUserPop;
 
     public Button ConfirmButton;
+    public TMP_InputField UserEmailInputField;
     public TMP_InputField UsernameInputField;
     public TMP_InputField PasswordInputField;
 
     [System.Serializable]
     public class NewUserData {
+        public string email;
         public string username;
         public string password;
     }
@@ -71,6 +73,7 @@ public class Title : MonoBehaviour {
     {
         NewUserData dataToSend = new NewUserData
         {
+            email = UserEmailInputField.text,
             username = UsernameInputField.text,
             password = PasswordInputField.text
         };
