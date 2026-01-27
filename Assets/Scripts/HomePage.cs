@@ -89,8 +89,6 @@ public class HomePage : MonoBehaviour
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
 
-                //await request.SendWebRequest();
-
                 try
                 {
                     await request.SendWebRequest();

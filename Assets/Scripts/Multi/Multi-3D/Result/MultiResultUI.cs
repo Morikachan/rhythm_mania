@@ -25,16 +25,18 @@ public class MultiResultUI : MonoBehaviour {
             .ThenByDescending(p => p.Accuracy)
             .ToList();
 
-        Setup(sorted[0], WinnerResultImage, WinnerResultNick);
-        Setup(sorted[1], SecondResultImage, SecondResultNick);
+        Setup(sorted[0], WinnerResultImage, WinnerResultNick, WinnerResultScore);
+        Setup(sorted[1], SecondResultImage, SecondResultNick, SecondResultScore);
     }
 
-    void Setup(PlayerRuntimeData d, Image img, TextMeshProUGUI nick)
+    void Setup(PlayerRuntimeData d, Image img, TextMeshProUGUI nick, TextMeshProUGUI score)
     {
         Player p = PhotonNetwork.PlayerList
             .First(x => x.ActorNumber == d.actorNumber);
 
         nick.text = p.CustomProperties["UserName"].ToString();
+
+        score.text = d.score.ToString();
 
         PlayerCardIllustLoader.instance.LoadPlayerIllustration(
             img,
