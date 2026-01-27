@@ -75,6 +75,8 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
     [Header("Song Source")]
     public SongListManager songListManager;
 
+    private bool decisionMade = false;
+
     private const string PROP_USERNAME = "UserName";
     private const string PROP_CARD_ID = "CardID";
 
@@ -155,47 +157,87 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         if(currentPhase == RoomPhase.Preparation)
             RefreshPreparationUI();
 
-        //if(currentPhase == RoomPhase.SongList && AllPlayersSelected())
-        //{
-        //    SetPhase(RoomPhase.Roulette);
-        //    ShowRouletteLocally();
-
-        //    if(PhotonNetwork.IsMasterClient)
-        //        StartCoroutine(RouletteFlow());
-        //}
-
         if(currentPhase == RoomPhase.SongList && AllPlayersSelected())
         {
+            if(decisionMade)
+                return;
+
+            decisionMade = true;
+
             SetPhase(RoomPhase.Roulette);
             ShowRouletteLocally();
 
             if(!PhotonNetwork.IsMasterClient)
                 return;
 
-            Player selectedPlayer;
-            SelectResultType result = GetSelectResult(out selectedPlayer);
-
-            switch(result)
-            {
-                case SelectResultType.TwoSelected:
-                    StartCoroutine(RouletteFlow());
-                    break;
-
-                case SelectResultType.OneSelectedOneRecommend:
-                    StartCoroutine(DirectWinnerFlow(selectedPlayer));
-                    break;
-
-                case SelectResultType.TwoRecommend:
-                    StartCoroutine(RandomFromAllSongsFlow());
-                    break;
-            }
+            DecideFinalSong();
         }
 
         if(currentPhase == RoomPhase.Preparation && AllPlayersReady())
             StartCoroutine(ChangeToGameSceneWithDalay());
     }
 
+    public override void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged)
+    {
+        if(propertiesThatChanged.ContainsKey("FinalSongID"))
+        {
+            int songId = (int)propertiesThatChanged["FinalSongID"];
+            StartCoroutine(ShowFinalSong(songId));
+        }
+    }
+
+    IEnumerator ShowFinalSong(int songId)
+    {
+        yield return new WaitForSeconds(1f);
+
+        Song song = songListManager.GetSongById(songId);
+
+        photonView.RPC(
+            nameof(RPC_ShowWinner),
+            RpcTarget.All,
+            -1,
+            song.song_name,
+            song.song_level.ToString(),
+            song.song_bpm.ToString(),
+            song.song_id
+        );
+
+        yield return new WaitForSeconds(2f);
+        photonView.RPC(nameof(RPC_GoPreparation), RpcTarget.All);
+    }
+
     //  ROULETTE FLOW
+
+    void DecideFinalSong()
+    {
+        Player selectedPlayer;
+        SelectResultType result = GetSelectResult(out selectedPlayer);
+
+        PhotonHashtable roomProps = new PhotonHashtable();
+
+        switch(result)
+        {
+            case SelectResultType.OneSelectedOneRecommend:
+                roomProps["FinalSongID"] =
+                    (int)selectedPlayer.CustomProperties["SongID"];
+                break;
+
+            case SelectResultType.TwoSelected:
+                Player[] players = PhotonNetwork.PlayerList;
+                Player winner = players[UnityEngine.Random.Range(0, players.Length)];
+                roomProps["FinalSongID"] =
+                    (int)winner.CustomProperties["SongID"];
+                break;
+
+            case SelectResultType.TwoRecommend:
+                List<Song> allSongs = songListManager.GetAllSongs();
+                Song randomSong = allSongs[UnityEngine.Random.Range(0, allSongs.Count)];
+                roomProps["FinalSongID"] = randomSong.song_id;
+                break;
+        }
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+    }
 
     SelectResultType GetSelectResult(out Player selectedPlayer)
     {

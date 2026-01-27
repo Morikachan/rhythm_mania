@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Text;
 using TMPro;
+using static CardSelectPopup;
 
 public class HomePage : MonoBehaviour
 {
@@ -62,6 +63,16 @@ public class HomePage : MonoBehaviour
     void Start()
     {
         GetJsonData();
+    }
+
+    void OnEnable()
+    {
+        HomeCardEvents.OnHomeCardChanged += OnHomeCardChanged;
+    }
+
+    void OnDisable()
+    {
+        HomeCardEvents.OnHomeCardChanged -= OnHomeCardChanged;
     }
 
     async void GetJsonData()
@@ -156,6 +167,15 @@ public class HomePage : MonoBehaviour
 
         string fileName = $"card_{newCardID}.jpg";
         CardLoader.Instance.LoadCardIllustration(homeImage, CARD_ICONS_PATH, fileName);
+    }
+
+    private void OnHomeCardChanged(int newCardId)
+    {
+        CURRENT_CARD_ID = newCardId;
+        PlayerPrefs.SetInt(HOME_CARD_ID_KEY, newCardId);
+        PlayerPrefs.Save();
+
+        DisplayCard(newCardId);
     }
 
     private void UpdateProgress(int exp)

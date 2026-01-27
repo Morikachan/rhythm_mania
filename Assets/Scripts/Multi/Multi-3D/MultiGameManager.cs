@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.Audio;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 {
@@ -172,9 +173,37 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
     //  END 
 
+    //public void EndGame()
+    //{
+    //    MultiResultDataHolder.instance.SetResults(players);
+    //    PhotonNetwork.LoadLevel("MultiResultScene");
+    //}
+
     public void EndGame()
     {
-        MultiResultDataHolder.instance.SetResults(players);
+        var myData = players[PhotonNetwork.LocalPlayer.ActorNumber];
+
+        Hashtable props = new Hashtable
+    {
+        { "Score", myData.score },
+        { "Perfect", myData.perfect },
+        { "Great", myData.great },
+        { "Bad", myData.bad },
+        { "Miss", myData.miss },
+        { "HP", myData.hp }
+    };
+
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+        if(PhotonNetwork.IsMasterClient)
+        {
+            StartCoroutine(WaitAndLoad());
+        }
+    }
+
+    IEnumerator WaitAndLoad()
+    {
+        yield return new WaitForSeconds(0.5f);
         PhotonNetwork.LoadLevel("MultiResultScene");
     }
 }

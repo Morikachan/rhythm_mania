@@ -98,6 +98,7 @@ public class LongNote : MonoBehaviour {
             transform.position = new Vector3(LaneToX(lane), 0.5f, judgeZ);
         }
 
+        // bodyPart.localScale = new Vector3(1, 0.01f, length);
         bodyPart.localScale = new Vector3(1, 1, length);
         bodyPart.localPosition = new Vector3(0, 0, length * 0.5f);
 

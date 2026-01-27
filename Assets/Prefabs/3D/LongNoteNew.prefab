@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1166599124525868671}
-  - component: {fileID: 4721274416591878819}
+  - component: {fileID: 5522673699108088610}
   m_Layer: 0
-  m_Name: MultiLongNote
+  m_Name: LongNoteNew
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,7 +35,7 @@ Transform:
   - {fileID: 9106058859872848196}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4721274416591878819
+--- !u!114 &5522673699108088610
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1011177580773927283}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae252147c53bbee42a86da78df83cce7, type: 3}
+  m_Script: {fileID: 11500000, guid: f8756b92d7278514892fba6db660aa57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lane: 0

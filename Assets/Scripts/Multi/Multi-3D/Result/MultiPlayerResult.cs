@@ -5,6 +5,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Text;
 using UnityEngine.UI;
+using Photon.Realtime;
 
 public class MultiPlayerResult : MonoBehaviour {
     [Header("UI")]
@@ -34,17 +35,36 @@ public class MultiPlayerResult : MonoBehaviour {
         UpdateUI();
     }
 
+    //void LoadLocalPlayerData()
+    //{
+    //    int actor = PhotonNetwork.LocalPlayer.ActorNumber;
+
+    //    var data = MultiResultDataHolder.instance.results[actor];
+
+    //    score = data.score;
+    //    perfect = data.perfect;
+    //    great = data.great;
+    //    bad = data.bad;
+    //    miss = data.miss;
+    //}
+
     void LoadLocalPlayerData()
     {
-        int actor = PhotonNetwork.LocalPlayer.ActorNumber;
+        Player p = PhotonNetwork.LocalPlayer;
+        var props = p.CustomProperties;
 
-        var data = MultiResultDataHolder.instance.results[actor];
-
-        score = data.score;
-        perfect = data.perfect;
-        great = data.great;
-        bad = data.bad;
-        miss = data.miss;
+        if(props.ContainsKey("Score"))
+        {
+            score = (int)props["Score"];
+            perfect = (int)props["Perfect"];
+            great = (int)props["Great"];
+            bad = (int)props["Bad"];
+            miss = (int)props["Miss"];
+        }
+        else
+        {
+            score = perfect = great = bad = miss = 0;
+        }
     }
 
     void CalculateRank()

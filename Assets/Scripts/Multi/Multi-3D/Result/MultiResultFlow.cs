@@ -1,6 +1,9 @@
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
-public class MultiResultFlow : MonoBehaviour {
+public class MultiResultFlow : MonoBehaviourPunCallbacks {
     public GameObject multiResult;
     public GameObject playerResult;
     public MultiPlayerResult playerResultScript;
@@ -20,8 +23,38 @@ public class MultiResultFlow : MonoBehaviour {
         }
         else
         {
-            UnityEngine.SceneManagement.SceneManager
-                .LoadScene("ModeSelectionScene");
+            LeaveAndReset();
         }
+    }
+
+    public void LeaveAndReset()
+    {
+        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        {
+            { "Ready", false },
+            { "SelectState", "Selecting" },
+            { "SongID", -1 }
+        };
+        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+        if(MultiResultDataHolder.instance != null)
+        {
+            Destroy(MultiResultDataHolder.instance.gameObject);
+        }
+
+        if(PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
+        else
+        {
+            SceneManager.LoadScene("ModeSelectionScene");
+        }
+    }
+
+    public override void OnLeftRoom()
+    {
+        Debug.Log("Successfully left the room. Returning to menu.");
+        SceneManager.LoadScene("ModeSelectionScene");
     }
 }

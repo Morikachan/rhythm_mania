@@ -178,6 +178,11 @@ public class SongListManager : MonoBehaviour
         }
     }
 
+    public Song GetSongById(int songId)
+    {
+        return cachedSongs.Find(s => s.song_id == songId);
+    }
+
     public List<Song> GetAllSongs()
     {
         return cachedSongs;
