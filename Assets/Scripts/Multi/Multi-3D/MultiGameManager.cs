@@ -47,7 +47,32 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
     void Start()
     {
-        Debug.Log("MultiGameManager started");
+        Debug.Log(
+            $"[DEBUG] P1 Song = {PhotonNetwork.PlayerList[0].CustomProperties["SongName"]}"
+        );
+        Debug.Log(
+            $"[DEBUG] P2 Song = {PhotonNetwork.PlayerList[1].CustomProperties["SongName"]}"
+        );
+        Debug.Log(
+            $"[DEBUG] FINAL Song = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongName"]}"
+        );
+
+        SongDataHolder.instance.SetMultiLive(true);
+
+        bool synced = SongDataHolder.instance.SyncFromRoom();
+
+        if(!synced)
+        {
+            Debug.LogError("SONG SYNC FAILED — GAME ABORTED");
+            return;
+        }
+
+        // DEBUG
+        Debug.Log(
+            $"[MULTI GAME] Final Song = {SongDataHolder.instance.SelectedSongName} " +
+            $"({SongDataHolder.instance.SelectedSongId})"
+        );
+
         InitPlayers();
 
         StartCoroutine(StartGameAfterDelay());
@@ -170,15 +195,6 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
         player1Combo.text = players[p[0].ActorNumber].combo.ToString();
         player2Combo.text = players[p[1].ActorNumber].combo.ToString();
     }
-
-    //  END 
-
-    //public void EndGame()
-    //{
-    //    MultiResultDataHolder.instance.SetResults(players);
-    //    PhotonNetwork.LoadLevel("MultiResultScene");
-    //}
-
     public void EndGame()
     {
         var myData = players[PhotonNetwork.LocalPlayer.ActorNumber];

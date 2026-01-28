@@ -26,7 +26,7 @@ public class CardInventoryService : MonoBehaviour
 
     private const string USER_ID_KEY = "UserID";
     private const string URL =
-        "http://localhost/rhythm_mania/Database/core/getCardList.php";
+        "http://153.126.183.193/student/k248010/rhythm_mania_db/core/getCardList.php";
 
     void Awake()
     {

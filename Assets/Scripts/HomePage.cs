@@ -58,7 +58,6 @@ public class HomePage : MonoBehaviour
         public int coins;
     };
 
-     //public string receiveUrl = "http://localhost/rhythm_mania/Database/user-home-info.php";
     public string receiveUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/user-home-info.php";
 
     void Start()
@@ -99,8 +98,7 @@ public class HomePage : MonoBehaviour
                     Debug.LogError("SYSTEM ERROR: " + e.Message);
                     return;
                 }
-                //Debug.Log("HTTP Status: " + request.responseCode);
-                Debug.Log("Raw response: " + request.downloadHandler.text);
+                //Debug.Log("Raw response: " + request.downloadHandler.text);
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
@@ -157,15 +155,6 @@ public class HomePage : MonoBehaviour
 
         string fileName = $"card_{newCardID}.jpg";
         CardLoader.Instance.LoadCardIllustration(homeImage, CARD_ICONS_PATH, fileName);
-    }
-
-    private void OnHomeCardChanged(int newCardId)
-    {
-        CURRENT_CARD_ID = newCardId;
-        PlayerPrefs.SetInt(HOME_CARD_ID_KEY, newCardId);
-        PlayerPrefs.Save();
-
-        DisplayCard(newCardId);
     }
 
     private void UpdateProgress(int exp)

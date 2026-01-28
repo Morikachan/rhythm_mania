@@ -307,7 +307,7 @@ MonoBehaviour:
   noRankingPrefab: {fileID: 1797244168024607851, guid: 5c3d9ac9305fb5d49982a493c0a3060d, type: 3}
   openRankingButton: {fileID: 1160706855}
   closeRankingButton: {fileID: 386572868}
-  receiveUrl: http://localhost/rhythm_mania/Database/get-song-ranking.php
+  receiveUrl: http://153.126.183.193/student/k248010/rhythm_mania_db/get-song-ranking.php
 --- !u!114 &232418237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3613,7 +3613,7 @@ MonoBehaviour:
   infoSongScore: {fileID: 336885912}
   sampleSongManager: {fileID: 1686502904}
   rankingManager: {fileID: 232418236}
-  receiveUrl: http://localhost/rhythm_mania/Database/get-songlist.php
+  receiveUrl: http://153.126.183.193/student/k248010/rhythm_mania_db/get-songlist.php
 --- !u!114 &1962668282
 MonoBehaviour:
   m_ObjectHideFlags: 0

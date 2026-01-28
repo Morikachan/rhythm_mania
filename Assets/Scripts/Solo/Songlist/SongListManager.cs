@@ -24,7 +24,7 @@ public class SongListManager : MonoBehaviour
 
     private const string USER_ID_KEY = "UserID";
 
-    public string receiveUrl = "http://localhost/rhythm_mania/Database/get-songlist.php";
+    public string receiveUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/get-songlist.php";
 
     [System.Serializable]
     public class UserData

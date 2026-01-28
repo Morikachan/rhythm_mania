@@ -18,7 +18,6 @@ public class CardItemController : MonoBehaviour
         cardId = id;
         popup = owner;
 
-        // „x„p„s„‚„…„x„{„p „{„p„‚„„„y„~„{„y
         if (CardLoader.Instance != null)
         {
             string fileName = $"card_{cardId}.jpg";

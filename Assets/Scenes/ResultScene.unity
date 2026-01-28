@@ -380,7 +380,7 @@ MonoBehaviour:
   badText: {fileID: 378475703}
   misseText: {fileID: 13689241}
   rankText: {fileID: 1161695920}
-  url: http://localhost/rhythm_mania/Database/update_user_song.php
+  url: http://153.126.183.193/student/k248010/rhythm_mania_db/update_user_song.php
 --- !u!4 &126183279
 Transform:
   m_ObjectHideFlags: 0

@@ -20,7 +20,7 @@ public class RankingManager : MonoBehaviour
     public Button closeRankingButton;
 
     [Header("Settings")]
-    public string receiveUrl = "http://localhost/rhythm_mania/Database/get-song-ranking.php";
+    public string receiveUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/get-song-ranking.php";
 
     [System.Serializable]
     public class RequestData
