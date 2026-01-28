@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardItemController : MonoBehaviour {
+public class CardItemController : MonoBehaviour
+{
     public Image cardImage;
     public Image checkMark;
     public Button button;
@@ -9,12 +10,21 @@ public class CardItemController : MonoBehaviour {
     private int cardId;
     private CardSelectPopup popup;
 
-    public void Setup(int id, Sprite sprite, CardSelectPopup owner, bool selected)
+    private const string CARD_ICONS_PATH =
+        @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_illust\";
+
+    public void Setup(int id, CardSelectPopup owner, bool selected)
     {
         cardId = id;
         popup = owner;
 
-        cardImage.sprite = sprite;
+        // „x„p„s„‚„…„x„{„p „{„p„‚„„„y„~„{„y
+        if (CardLoader.Instance != null)
+        {
+            string fileName = $"card_{cardId}.jpg";
+            CardLoader.Instance.LoadCardIllustration(cardImage, CARD_ICONS_PATH, fileName);
+        }
+
         checkMark.gameObject.SetActive(selected);
 
         button.onClick.RemoveAllListeners();

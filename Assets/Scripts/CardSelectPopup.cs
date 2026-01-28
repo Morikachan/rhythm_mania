@@ -5,7 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-public class CardSelectPopup : MonoBehaviour {
+public class CardSelectPopup : MonoBehaviour
+{
     [Header("UI")]
     public Transform gridParent;
     public GameObject cardItemPrefab;
@@ -19,7 +20,15 @@ public class CardSelectPopup : MonoBehaviour {
     private const string USER_ID_KEY = "UserID";
     private const string HOME_CARD_ID_KEY = "HomeCardID";
 
-    private string setHomeUrl = "http://localhost/rhythm_mania/Database/change-home-char.php";
+    private string setHomeUrl =
+        "http://localhost/rhythm_mania/Database/change-home-char.php";
+
+    [System.Serializable]
+    public class ChangeHomeCardPayload
+    {
+        public string user_id;
+        public int card_id;
+    }
 
     public void Open(List<CardData> cards)
     {
@@ -36,24 +45,19 @@ public class CardSelectPopup : MonoBehaviour {
 
     void BuildGrid(List<CardData> cards)
     {
-        foreach(Transform c in gridParent)
+        foreach (Transform c in gridParent)
             Destroy(c.gameObject);
 
         items.Clear();
 
-        foreach(var card in cards)
+        foreach (var card in cards)
         {
             GameObject obj = Instantiate(cardItemPrefab, gridParent);
             var ctrl = obj.GetComponent<CardItemController>();
 
             bool isSelected = card.card_id == selectedCardId;
 
-            ctrl.Setup(
-                card.card_id,
-                card.sprite,
-                this,
-                isSelected
-            );
+            ctrl.Setup(card.card_id, this, isSelected);
 
             items.Add(ctrl);
         }
@@ -63,13 +67,13 @@ public class CardSelectPopup : MonoBehaviour {
     {
         selectedCardId = cardId;
 
-        foreach(var item in items)
+        foreach (var item in items)
             item.SetSelected(item.GetCardId() == selectedCardId);
     }
 
     void OnSelectClicked()
     {
-        if(selectedCardId == currentHomeCardId)
+        if (selectedCardId == currentHomeCardId)
         {
             Close();
             return;
@@ -78,13 +82,9 @@ public class CardSelectPopup : MonoBehaviour {
         StartCoroutine(SendSelectRequest());
     }
 
-    public static class HomeCardEvents {
-        public static System.Action<int> OnHomeCardChanged;
-    }
-
     IEnumerator SendSelectRequest()
     {
-        var payload = new
+        var payload = new ChangeHomeCardPayload
         {
             user_id = PlayerPrefs.GetString(USER_ID_KEY),
             card_id = selectedCardId
@@ -100,12 +100,10 @@ public class CardSelectPopup : MonoBehaviour {
 
         yield return req.SendWebRequest();
 
-        if(req.result == UnityWebRequest.Result.Success)
+        if (req.result == UnityWebRequest.Result.Success)
         {
             PlayerPrefs.SetInt(HOME_CARD_ID_KEY, selectedCardId);
             PlayerPrefs.Save();
-
-            HomeCardEvents.OnHomeCardChanged?.Invoke(selectedCardId);
 
             Close();
         }

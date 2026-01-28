@@ -58,28 +58,18 @@ public class HomePage : MonoBehaviour
         public int coins;
     };
 
-     public string receiveUrl = "http://localhost/rhythm_mania/Database/user-home-info.php";
+     //public string receiveUrl = "http://localhost/rhythm_mania/Database/user-home-info.php";
+    public string receiveUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/user-home-info.php";
 
     void Start()
     {
         GetJsonData();
     }
-
-    void OnEnable()
-    {
-        HomeCardEvents.OnHomeCardChanged += OnHomeCardChanged;
-    }
-
-    void OnDisable()
-    {
-        HomeCardEvents.OnHomeCardChanged -= OnHomeCardChanged;
-    }
-
     async void GetJsonData()
     {
         UserData dataToSend = null;
 
-        if(PlayerPrefs.HasKey(USER_ID_KEY))
+        if (PlayerPrefs.HasKey(USER_ID_KEY))
         {
             dataToSend = new UserData
             {
@@ -87,13 +77,13 @@ public class HomePage : MonoBehaviour
             };
         };
 
-        if(dataToSend != null)
+        if (dataToSend != null)
         {
             string jsonString = JsonUtility.ToJson(dataToSend);
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
 
 
-            using(UnityWebRequest request = new UnityWebRequest(receiveUrl, "POST"))
+            using (UnityWebRequest request = new UnityWebRequest(receiveUrl, "POST"))
             {
 
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -104,15 +94,15 @@ public class HomePage : MonoBehaviour
                 {
                     await request.SendWebRequest();
                 }
-                catch(System.Exception e)
+                catch (System.Exception e)
                 {
                     Debug.LogError("SYSTEM ERROR: " + e.Message);
                     return;
                 }
                 //Debug.Log("HTTP Status: " + request.responseCode);
-                //Debug.Log("Raw response: " + request.downloadHandler.text);
+                Debug.Log("Raw response: " + request.downloadHandler.text);
 
-                if(request.result == UnityWebRequest.Result.Success)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
                     string jsonResponse = request.downloadHandler.text;
 
