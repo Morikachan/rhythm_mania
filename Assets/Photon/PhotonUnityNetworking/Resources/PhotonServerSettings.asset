@@ -44,6 +44,8 @@ MonoBehaviour:
   - RPC_GoPreparation
   - RPC_ShowWinner
   - RPC_StopMusic
+  - RPC_FinishGame
+  - RPC_ApplyJudge
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

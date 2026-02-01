@@ -11,7 +11,7 @@ public class CardInventoryService : MonoBehaviour
     {
         public string status;
         public string message;
-        public List<CardData> cardlist;
+        public List<CardData> cardList;
     }
 
     [System.Serializable]
@@ -73,7 +73,7 @@ public class CardInventoryService : MonoBehaviour
         var response =
             JsonUtility.FromJson<CardListResponse>(request.downloadHandler.text);
 
-        AllCards = response.cardlist ?? new List<CardData>();
+        AllCards = response.cardList ?? new List<CardData>();
 
         Debug.Log($"Loaded cards: {AllCards.Count}");
     }

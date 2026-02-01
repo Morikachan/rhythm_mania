@@ -9,6 +9,7 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
     public MultiPlayerResult playerResultScript;
 
     private bool showedPlayer = false;
+    private bool manuallyLeaving = false;
 
     public void OnNext()
     {
@@ -23,38 +24,42 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
         }
         else
         {
+            manuallyLeaving = true;
             LeaveAndReset();
         }
     }
 
     public void LeaveAndReset()
     {
-        ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
-        {
-            { "Ready", false },
-            { "SelectState", "Selecting" },
-            { "SongID", -1 }
-        };
+        ExitGames.Client.Photon.Hashtable props =
+            new ExitGames.Client.Photon.Hashtable
+            {
+                { "Ready", false },
+                { "SelectState", "Selecting" },
+                { "SongID", -1 }
+            };
+
         PhotonNetwork.LocalPlayer.SetCustomProperties(props);
 
         if(MultiResultDataHolder.instance != null)
-        {
             Destroy(MultiResultDataHolder.instance.gameObject);
-        }
 
         if(PhotonNetwork.InRoom)
         {
+            SongDataHolder.instance.SetMultiLive(false);
             PhotonNetwork.LeaveRoom();
         }
         else
-        {
-            SceneManager.LoadScene("ModeSelectionScene");
-        }
+            SceneManager.LoadScene("HomeScreen");
     }
 
     public override void OnLeftRoom()
     {
-        Debug.Log("Successfully left the room. Returning to menu.");
-        SceneManager.LoadScene("ModeSelectionScene");
+        if(!manuallyLeaving)
+        {
+            return; // DO NOTHING
+        }
+
+        SceneManager.LoadScene("HomeScreen");
     }
 }

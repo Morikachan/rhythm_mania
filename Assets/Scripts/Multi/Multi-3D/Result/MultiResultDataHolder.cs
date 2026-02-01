@@ -6,6 +6,8 @@ public class MultiResultDataHolder : MonoBehaviour {
 
     public Dictionary<int, PlayerRuntimeData> results;
 
+    public PlayerRuntimeData myResult;
+
     void Awake()
     {
         if(instance == null)
@@ -19,5 +21,11 @@ public class MultiResultDataHolder : MonoBehaviour {
     public void SetResults(Dictionary<int, PlayerRuntimeData> data)
     {
         results = data;
+    }
+
+    public void SetMyResult(PlayerRuntimeData data)
+    {
+        myResult = data;
+        Debug.Log($"[MultiResultDataHolder] Saved MY result: score={data.score}, rank={data.Rank}");
     }
 }

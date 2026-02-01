@@ -150,7 +150,6 @@ public class RankingManager : MonoBehaviour
                 {
                     RankingResponse response = JsonUtility.FromJson<RankingResponse>(jsonResponse);
 
-                    Debug.Log("Raw response: " + request.downloadHandler.text);
                     if (response != null && response.status == "success")
                     {
                         if (response.ranking == null || response.ranking.Count == 0)

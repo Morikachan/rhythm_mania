@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
+using Unity.Burst.Intrinsics;
 
 public class Result : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class Result : MonoBehaviour
     private int greatCount;
     private int badCount;
     private int missCount;
+    private int comboCount;
     private string rank = "D";
 
     private int selected_song_id;
@@ -41,7 +43,7 @@ public class Result : MonoBehaviour
         public bool score_isNew;
     }
 
-    public string url = "http://localhost/rhythm_mania/Database/update_user_song.php";
+    public string url = "http://153.126.183.193/student/k248010/rhythm_mania_db/update_user_song.php";
 
     void Start()
     {
@@ -50,12 +52,14 @@ public class Result : MonoBehaviour
         greatCount = GameManager.instance.great;
         badCount = GameManager.instance.bad;
         missCount = GameManager.instance.miss;
+        comboCount = GameManager.instance.combo;
+        Debug.Log(comboCount);
         SetRank();
 
-        StartCoroutine(GetJsonData());
+        StartCoroutine(SendJsonData());
     }
 
-    IEnumerator GetJsonData()
+    IEnumerator SendJsonData()
     {
         UserData dataToSend = null;
 
@@ -94,23 +98,25 @@ public class Result : MonoBehaviour
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    try
-                    {
-                        ServerResponse response = JsonUtility.FromJson<ServerResponse>(request.downloadHandler.text);
+                    string rawJson = request.downloadHandler.text.Trim();
+                    Debug.Log("Clean JSON: " + rawJson);
 
-                        if (response.status == "success")
-                        {
-                            SetResultText();
-                            GameManager.instance.ResetGame();
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Server error: " + response.message);
-                        }
-                    }
-                    catch
+                    ServerResponse response = JsonUtility.FromJson<ServerResponse>(rawJson);
+
+                    if(response == null || string.IsNullOrEmpty(response.status))
                     {
-                        Debug.LogError("Invalid JSON format from server: " + request.downloadHandler.text);
+                        Debug.LogError("JSON parsed, but response is NULL or empty");
+                        yield break;
+                    }
+
+                    if(response.status == "success")
+                    {
+                        SetResultText();
+                        GameManager.instance.ResetGame();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Server error: " + response.message);
                     }
                 }
                 else

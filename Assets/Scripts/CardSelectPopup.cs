@@ -21,7 +21,7 @@ public class CardSelectPopup : MonoBehaviour
     private const string HOME_CARD_ID_KEY = "HomeCardID";
 
     private string setHomeUrl =
-        "http://localhost/rhythm_mania/Database/change-home-char.php";
+        "http://153.126.183.193/student/k248010/rhythm_mania_db/change-home-char.php";
 
     [System.Serializable]
     public class ChangeHomeCardPayload
@@ -104,6 +104,8 @@ public class CardSelectPopup : MonoBehaviour
         {
             PlayerPrefs.SetInt(HOME_CARD_ID_KEY, selectedCardId);
             PlayerPrefs.Save();
+
+            ProfileSettingsManager.instance.SetProfileUIImage();
 
             Close();
         }

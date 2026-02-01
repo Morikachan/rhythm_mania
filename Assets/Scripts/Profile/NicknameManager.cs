@@ -1,37 +1,49 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Networking;
 using TMPro;
+using UnityEngine.UI;
 
 public class NicknameManager : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject popupPanel;           // The 'EditNickPopup' GameObject
+    public GameObject popupPanel;
     public TMP_InputField nickInput;        // The InputField inside the popup
-    public TextMeshProUGUI userNickValue;   // The text on the main screen (UserNickValue)
+    public TextMeshProUGUI userNickValue;
+    public Button userNamePopupOpenButton;
+    public Button userNamePopupConfirmButton;
 
     [Header("Configuration")]
-    private const string BASE_URL = "http://localhost/rhythm_mania/";
+    private const string BASE_URL = "http://153.126.183.193/student/k248010/rhythm_mania_db/";
     private const string USER_ID_KEY = "UserID";
     private const string USER_NAME_KEY = "UserName";
 
     void Start()
     {
-        // Ensure popup is hidden at start
         if (popupPanel != null)
+        {
             popupPanel.SetActive(false);
+        }
+
+        userNamePopupOpenButton.onClick.AddListener(OpenEditPopup);
+        userNamePopupConfirmButton.onClick.AddListener(OnConfirmClicked);
     }
 
     public void OpenEditPopup()
     {
-        nickInput.text = userNickValue.text;
-        popupPanel.SetActive(true);
-    }
+        if(PlayerPrefs.HasKey(USER_NAME_KEY))
+        {
+            nickInput.text = PlayerPrefs.GetString(USER_NAME_KEY);
+        }
+        else
+        {
+            nickInput.text = "User";
+        }
 
-    public void CloseEditPopup()
-    {
-        popupPanel.SetActive(false);
+        nickInput.ForceLabelUpdate();
+        nickInput.MoveTextEnd(false);
+
+        popupPanel.SetActive(true);
     }
 
     public void OnConfirmClicked()
@@ -50,13 +62,13 @@ public class NicknameManager : MonoBehaviour
     IEnumerator SendNickChangeRequest(string newNick)
     {
         string userId = PlayerPrefs.GetString(USER_ID_KEY, "0");
-        string url = BASE_URL + "change_username.php";
+        string url = BASE_URL + "update_user_name.php";
 
         WWWForm form = new WWWForm();
         form.AddField("user_id", userId);
         form.AddField("user_name", newNick);
 
-        Debug.Log($"Sending Request to {url}: ID={userId}, NewName={newNick}");
+        // Debug.Log($"Sending Request to {url}: ID={userId}, NewName={newNick}");
 
         using (UnityWebRequest www = UnityWebRequest.Post(url, form))
         {
@@ -69,15 +81,14 @@ public class NicknameManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("Server Response: " + www.downloadHandler.text);
-
                 // --- SUCCESS ---
                 PlayerPrefs.SetString(USER_NAME_KEY, newNick);
                 PlayerPrefs.Save();
 
                 userNickValue.text = newNick;
 
-                CloseEditPopup();
+                // Close edit popup
+                popupPanel.SetActive(false);
             }
         }
     }

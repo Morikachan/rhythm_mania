@@ -26,6 +26,8 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
     public GameObject songListUI;
     public GameObject rouletteUI;
     public GameObject preparationUI;
+    public GameObject disconectionPopup;
+    public Button disconectionButton;
 
     [Header("Timers")]
     public TextMeshProUGUI songListTimerText;
@@ -555,11 +557,11 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         Player[] players = PhotonNetwork.PlayerList;
 
         if(players.Length > 0)
-            SetupPrepPlayer(players[0], 
+            SetupPrepPlayer(players[0],
                 Player1PrepNick, Player1PrepImage, Player1PrepStatusPlate, Player1PrepStatusText);
 
         if(players.Length > 1)
-            SetupPrepPlayer(players[1], 
+            SetupPrepPlayer(players[1],
                 Player2PrepNick, Player2PrepImage, Player2PrepStatusPlate, Player2PrepStatusText);
     }
 
@@ -581,7 +583,7 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
             ? p.CustomProperties["SelectState"].ToString()
             : "Selecting";
 
-        if(state == "Selected" && p.CustomProperties.ContainsKey("SongName")) { 
+        if(state == "Selected" && p.CustomProperties.ContainsKey("SongName")) {
             status.text = p.CustomProperties["SongName"].ToString();
             DisplaySongIllust(Int32.Parse(p.CustomProperties["SongID"].ToString()), songImg);
         }
@@ -645,6 +647,14 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
 
     public override void OnLeftRoom()
     {
+        disconectionPopup.SetActive(true);
+        Time.timeScale = 0;
+        //PhotonNetwork.LoadLevel("GameModeSelection");
+    }
+
+    public void disconectionButtonOnClickHome()
+    {
+        Time.timeScale = 1;
         PhotonNetwork.LoadLevel("GameModeSelection");
     }
 }

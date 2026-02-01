@@ -26,6 +26,18 @@ public class MusicManager : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        if(played && audioSource.isPlaying)
+        {
+            if(audioSource.time >= audioSource.clip.length - 0.1f && !isMulti)
+            {
+                played = false;
+                StartCoroutine(EndGame());
+            }
+        }
+    }
+
     public void PlayMusic(float delay)
     {
         if (audioSource.clip == null)
@@ -79,15 +91,24 @@ public class MusicManager : MonoBehaviour
         played = false;
     }
 
-    void Update()
+    public void SetSongByName(string newSongName)
     {
-        if (played && audioSource.isPlaying)
+        songName = newSongName;
+
+        audioSource.Stop();
+        audioSource.clip = null;
+        played = false;
+
+        AudioClip clip = Resources.Load<AudioClip>("Musics/" + songName);
+
+        if(clip != null)
         {
-            if (audioSource.time >= audioSource.clip.length - 0.1f)
-            {
-                played = false;
-                StartCoroutine(EndGame());
-            }
+            audioSource.clip = clip;
+            Debug.Log($"[MUSIC] Song set to: {songName}");
+        }
+        else
+        {
+            Debug.LogError($"[MUSIC] Clip not found: Musics/{songName}");
         }
     }
 
@@ -101,9 +122,6 @@ public class MusicManager : MonoBehaviour
         finishText.SetActive(true);
         yield return new WaitForSeconds(1);
 
-        if (isMulti)
-            MultiGameManager.instance.EndGame();
-        else
-            SceneManager.LoadScene("ResultScene");
+        SceneManager.LoadScene("ResultScene");
     }
 }

@@ -136,7 +136,11 @@ public class MultiLongNote : MonoBehaviour {
         nextTickTime = Time.time + tickInterval;
 
         judge.ShowJudge(type);
-        gm.AddScore(localActor, type == MultiJudge.JudgeType.Perfect ? 1000 : 300);
+        gm.SendJudge(
+            localActor,
+            type,
+            type == MultiJudge.JudgeType.Perfect ? 1000 : 300
+        );
     }
 
     //  TICK 
@@ -146,7 +150,7 @@ public class MultiLongNote : MonoBehaviour {
 
         if(Time.time >= nextTickTime)
         {
-            gm.AddScore(localActor, 50);
+            gm.SendJudge(localActor, MultiJudge.JudgeType.Perfect, 50);
             nextTickTime += tickInterval;
         }
     }
@@ -160,8 +164,7 @@ public class MultiLongNote : MonoBehaviour {
         {
             releasedEarly = true;
             judge.ShowJudge(MultiJudge.JudgeType.Bad);
-            gm.ResetCombo(localActor);
-            gm.Damage(localActor, 50);
+            gm.SendJudge(localActor, MultiJudge.JudgeType.Bad);
         }
     }
 
@@ -178,7 +181,7 @@ public class MultiLongNote : MonoBehaviour {
 
         if(!releasedEarly)
         {
-            gm.AddScore(localActor, 500);
+            gm.SendJudge(localActor, MultiJudge.JudgeType.Perfect, 500);
             judge.ShowJudge(MultiJudge.JudgeType.Perfect);
         }
 
@@ -190,8 +193,7 @@ public class MultiLongNote : MonoBehaviour {
     {
         completed = true;
 
-        gm.ResetCombo(localActor);
-        gm.Damage(localActor, 100);
+        gm.SendJudge(localActor, MultiJudge.JudgeType.Miss);
         judge.ShowMissEffect();
 
         if(notes)

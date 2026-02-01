@@ -11,7 +11,7 @@ public class CardItemController : MonoBehaviour
     private CardSelectPopup popup;
 
     private const string CARD_ICONS_PATH =
-        @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_illust\";
+        @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_icons\";
 
     public void Setup(int id, CardSelectPopup owner, bool selected)
     {
@@ -20,7 +20,7 @@ public class CardItemController : MonoBehaviour
 
         if (CardLoader.Instance != null)
         {
-            string fileName = $"card_{cardId}.jpg";
+            string fileName = $"card_icon_{cardId}.png";
             CardLoader.Instance.LoadCardIllustration(cardImage, CARD_ICONS_PATH, fileName);
         }
 

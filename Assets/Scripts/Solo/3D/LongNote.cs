@@ -98,8 +98,7 @@ public class LongNote : MonoBehaviour {
             transform.position = new Vector3(LaneToX(lane), 0.5f, judgeZ);
         }
 
-        // bodyPart.localScale = new Vector3(1, 0.01f, length);
-        bodyPart.localScale = new Vector3(1, 1, length);
+        bodyPart.localScale = new Vector3(1, 0.01f, length);
         bodyPart.localPosition = new Vector3(0, 0, length * 0.5f);
 
         endPart.localPosition = new Vector3(0, 0, length + visualEndGap);
@@ -123,6 +122,8 @@ public class LongNote : MonoBehaviour {
         holding = true;
         nextTickTime = Time.time + tickInterval;
 
+        if(perfect) GameManager.instance.perfect++;
+        else GameManager.instance.great++;
         GameManager.instance.AddScore(perfect ? 1000 : 300);
         judge.ShowJudge(perfect ? 0 : 1);
     }
@@ -134,6 +135,7 @@ public class LongNote : MonoBehaviour {
 
         if(Time.time >= nextTickTime)
         {
+            GameManager.instance.perfect++;
             GameManager.instance.AddScore(50);
             nextTickTime += tickInterval;
         }
@@ -147,6 +149,7 @@ public class LongNote : MonoBehaviour {
         if(!IsKeyPressed())
         {
             releasedEarly = true;
+            GameManager.instance.bad++;
             judge.ShowJudge(2);
             HPManager.instance.ApplyJudge(Judge.JudgeType.Bad);
         }
@@ -165,6 +168,7 @@ public class LongNote : MonoBehaviour {
 
         if(!releasedEarly)
         {
+            GameManager.instance.perfect++;
             GameManager.instance.AddScore(500);
             judge.ShowJudge(0);
         }

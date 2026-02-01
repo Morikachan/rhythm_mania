@@ -29,4 +29,22 @@ public class PlayerRuntimeData
             return hit / total;
         }
     }
+
+    public string Rank
+    {
+        get
+        {
+            int total = perfect + great + bad + miss;
+            if(total == 0) return "D";
+
+            float percent = Accuracy * 100f;
+
+            if(bad == 0 && miss == 0) return "SS";
+            if(percent >= 95f) return "S";
+            if(percent >= 75f) return "A";
+            if(percent >= 60f) return "B";
+            if(percent >= 40f) return "C";
+            return "D";
+        }
+    }
 }
