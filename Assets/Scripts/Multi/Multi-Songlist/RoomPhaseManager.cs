@@ -87,6 +87,11 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         if(photonView == null)
             Debug.LogError("PhotonView STILL NULL");
 
+        if (disconectionButton != null)
+        {
+            disconectionButton.onClick.AddListener(disconectionButtonClearAllOnClick);
+        }
+
         songManager = FindObjectOfType<SampleSongManager>();
         SetPhase(RoomPhase.SongList);
 
@@ -639,22 +644,77 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
     }
 
     //  LEAVE ROOM 
-
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        PhotonNetwork.LeaveRoom();
+        CancelTimerAndCoroutines();
+
+        disconectionPopup.SetActive(true);
+        Time.timeScale = 0;
+    }
+
+    void CancelTimerAndCoroutines()
+    {
+        if (timerCoroutine != null)
+        {
+            StopCoroutine(timerCoroutine);
+            timerCoroutine = null;
+        }
     }
 
     public override void OnLeftRoom()
     {
-        disconectionPopup.SetActive(true);
-        Time.timeScale = 0;
-        //PhotonNetwork.LoadLevel("GameModeSelection");
-    }
-
-    public void disconectionButtonOnClickHome()
-    {
         Time.timeScale = 1;
         PhotonNetwork.LoadLevel("GameModeSelection");
+    }
+
+    public void disconectionButtonClearAllOnClick()
+    {
+        Time.timeScale = 1;
+        FullResetAndLeaveRoom();
+    }
+
+    public void FullResetAndLeaveRoom()
+    {
+        if (!PhotonNetwork.InRoom)
+        {
+            Debug.LogWarning("Not in room");
+            return;
+        }
+
+        if (timerCoroutine != null)
+        {
+            StopCoroutine(timerCoroutine);
+            timerCoroutine = null;
+        }
+
+        decisionMade = false;
+
+        PhotonHashtable playerProps = new PhotonHashtable
+        {
+            { "Ready", false },
+            { "SelectState", "Selecting" },
+            { "SongID", -1 },
+            { "SongName", "" },
+            { "SongLevel", "" },
+            { "SongBPM", "" },
+            { "Score", 0 },
+            { "Combo", 0 }
+        };
+
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProps);
+
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonHashtable roomProps = new PhotonHashtable
+        {
+            { "FinalSongID", null },
+            { "FinalSongName", null },
+            { "WinnerIndex", null }
+        };
+
+            PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+        }
+
+        PhotonNetwork.LeaveRoom();
     }
 }
