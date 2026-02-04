@@ -26,6 +26,5 @@ public class MultiResultDataHolder : MonoBehaviour {
     public void SetMyResult(PlayerRuntimeData data)
     {
         myResult = data;
-        Debug.Log($"[MultiResultDataHolder] Saved MY result: score={data.score}, rank={data.Rank}");
     }
 }

@@ -98,7 +98,6 @@ public class HomePage : MonoBehaviour
                     Debug.LogError("SYSTEM ERROR: " + e.Message);
                     return;
                 }
-                //Debug.Log("Raw response: " + request.downloadHandler.text);
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {

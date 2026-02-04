@@ -53,7 +53,6 @@ public class Result : MonoBehaviour
         badCount = GameManager.instance.bad;
         missCount = GameManager.instance.miss;
         comboCount = GameManager.instance.combo;
-        Debug.Log(comboCount);
         SetRank();
 
         StartCoroutine(SendJsonData());
@@ -99,7 +98,6 @@ public class Result : MonoBehaviour
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     string rawJson = request.downloadHandler.text.Trim();
-                    Debug.Log("Clean JSON: " + rawJson);
 
                     ServerResponse response = JsonUtility.FromJson<ServerResponse>(rawJson);
 

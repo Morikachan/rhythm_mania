@@ -12,13 +12,11 @@ public class MultiLobbyBack : MonoBehaviourPunCallbacks
             return;
         }
 
-        Debug.Log("Leaving room...");
         PhotonNetwork.LeaveRoom();
     }
 
     public override void OnLeftRoom()
     {
-        Debug.Log("Left room callback received");
         SceneManager.LoadScene("GameModeSelection");
     }
 }

@@ -74,8 +74,6 @@ public class CardInventoryService : MonoBehaviour
             JsonUtility.FromJson<CardListResponse>(request.downloadHandler.text);
 
         AllCards = response.cardList ?? new List<CardData>();
-
-        Debug.Log($"Loaded cards: {AllCards.Count}");
     }
 }
 

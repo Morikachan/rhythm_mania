@@ -8,6 +8,7 @@ using PhotonHashtable = ExitGames.Client.Photon.Hashtable;
 using static SongListManager;
 using System;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public enum RoomPhase {
     SongList,
@@ -78,6 +79,7 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
     public SongListManager songListManager;
 
     private bool decisionMade = false;
+    private bool isLoadingGame = false;
 
     private const string PROP_USERNAME = "UserName";
     private const string PROP_CARD_ID = "CardID";
@@ -91,6 +93,9 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         {
             disconectionButton.onClick.AddListener(disconectionButtonClearAllOnClick);
         }
+
+        decisionMade = false;
+        isLoadingGame = false;
 
         songManager = FindObjectOfType<SampleSongManager>();
         SetPhase(RoomPhase.SongList);
@@ -181,47 +186,44 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         }
 
         if(currentPhase == RoomPhase.Preparation && AllPlayersReady())
+        {
+            if (!PhotonNetwork.IsMasterClient) return;
+            if (isLoadingGame) return;
+
+            isLoadingGame = true;
             StartCoroutine(ChangeToGameSceneWithDalay());
+        }
     }
 
     public override void OnRoomPropertiesUpdate(PhotonHashtable propertiesThatChanged)
     {
         if(propertiesThatChanged.ContainsKey("FinalSongID"))
         {
-            //int songId = (int)propertiesThatChanged["FinalSongID"];
-            //StartCoroutine(ShowFinalSong(songId));
-
-
-            Debug.Log("========== [ROULETTE RESULT DEBUG] ==========");
-
             Player[] players = PhotonNetwork.PlayerList;
 
-            if(players.Length > 0)
-            {
-                Debug.Log(
-                    $"[DEBUG] P1 SelectState = {players[0].CustomProperties["SelectState"]}, " +
-                    $"SongID = {players[0].CustomProperties["SongID"]}, " +
-                    $"SongName = {players[0].CustomProperties["SongName"]}"
-                );
-            }
+            // if(players.Length > 0)
+            // {
+            //     Debug.Log(
+            //         $"[DEBUG] P1 SelectState = {players[0].CustomProperties["SelectState"]}, " +
+            //         $"SongID = {players[0].CustomProperties["SongID"]}, " +
+            //         $"SongName = {players[0].CustomProperties["SongName"]}"
+            //     );
+            // }
 
-            if(players.Length > 1)
-            {
-                Debug.Log(
-                    $"[DEBUG] P2 SelectState = {players[1].CustomProperties["SelectState"]}, " +
-                    $"SongID = {players[1].CustomProperties["SongID"]}, " +
-                    $"SongName = {players[1].CustomProperties["SongName"]}"
-                );
-            }
+            // if(players.Length > 1)
+            // {
+            //     Debug.Log(
+            //         $"[DEBUG] P2 SelectState = {players[1].CustomProperties["SelectState"]}, " +
+            //         $"SongID = {players[1].CustomProperties["SongID"]}, " +
+            //         $"SongName = {players[1].CustomProperties["SongName"]}"
+            //     );
+            // }
 
-            Debug.Log(
-                $"[DEBUG] FINAL SongID = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongID"]}, " +
-                $"FINAL SongName = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongName"]}, " +
-                $"WinnerIndex = {PhotonNetwork.CurrentRoom.CustomProperties["WinnerIndex"]}"
-            );
-
-            Debug.Log("============================================");
-
+            // Debug.Log(
+            //     $"[DEBUG] FINAL SongID = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongID"]}, " +
+            //     $"FINAL SongName = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongName"]}, " +
+            //     $"WinnerIndex = {PhotonNetwork.CurrentRoom.CustomProperties["WinnerIndex"]}"
+            // );
 
             int songId = (int)PhotonNetwork.CurrentRoom.CustomProperties["FinalSongID"];
             int winnerIndex = PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("WinnerIndex")
@@ -229,6 +231,7 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
                 : -1;
 
             string songName = PhotonNetwork.CurrentRoom.CustomProperties["FinalSongName"].ToString();
+            if (songName == "") return;
 
             StartCoroutine(ShowFinalSong(songId, songName, winnerIndex));
         }
@@ -443,6 +446,12 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
     IEnumerator ChangeToGameSceneWithDalay()
     {
         yield return new WaitForSeconds(2f);
+
+        if (!PhotonNetwork.IsMasterClient)
+            yield break;
+
+        PhotonNetwork.AutomaticallySyncScene = true;
+        
         PhotonNetwork.LoadLevel("Multi_3D-game");
     }
 
@@ -654,11 +663,14 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
 
     void CancelTimerAndCoroutines()
     {
-        if (timerCoroutine != null)
-        {
-            StopCoroutine(timerCoroutine);
-            timerCoroutine = null;
-        }
+        // if (timerCoroutine != null)
+        // {
+        //     StopCoroutine(timerCoroutine);
+        //     timerCoroutine = null;
+        // }
+        StopAllCoroutines();
+        timerCoroutine = null;
+        isLoadingGame = false;
     }
 
     public override void OnLeftRoom()
@@ -678,8 +690,11 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         if (!PhotonNetwork.InRoom)
         {
             Debug.LogWarning("Not in room");
+            SceneManager.LoadScene("GameModeSelection");
             return;
         }
+
+        PhotonNetwork.AutomaticallySyncScene = false;
 
         if (timerCoroutine != null)
         {
@@ -687,6 +702,8 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
             timerCoroutine = null;
         }
 
+        StopAllCoroutines();
+        isLoadingGame = false;
         decisionMade = false;
 
         PhotonHashtable playerProps = new PhotonHashtable
@@ -707,9 +724,9 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         {
             PhotonHashtable roomProps = new PhotonHashtable
         {
-            { "FinalSongID", null },
-            { "FinalSongName", null },
-            { "WinnerIndex", null }
+            { "FinalSongID", -1 },
+            { "FinalSongName", "" },
+            { "WinnerIndex", -1 }
         };
 
             PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);

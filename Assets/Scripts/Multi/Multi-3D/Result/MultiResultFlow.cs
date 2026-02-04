@@ -38,6 +38,11 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
 
     void Start()
     {
+        if(PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.AutomaticallySyncScene = false;
+        }
+
         if(!dataSent)
         {
             LoadLocalPlayerData();
@@ -98,28 +103,89 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
         }
     }
 
+    //public void LeaveAndReset()
+    //{
+    //    ExitGames.Client.Photon.Hashtable props =
+    //        new ExitGames.Client.Photon.Hashtable
+    //        {
+    //            { "Ready", false },
+    //            { "SelectState", "Selecting" },
+    //            { "SongID", -1 }
+    //        };
+
+    //    PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+
+    //    if(MultiResultDataHolder.instance != null)
+    //        Destroy(MultiResultDataHolder.instance.gameObject);
+
+    //    if(PhotonNetwork.InRoom)
+    //    {
+    //        SongDataHolder.instance.SetMultiLive(false);
+    //        PhotonNetwork.LeaveRoom();
+    //    }
+    //    else
+    //        SceneManager.LoadScene("HomeScreen");
+    //}
+
     public void LeaveAndReset()
     {
-        ExitGames.Client.Photon.Hashtable props =
+        Time.timeScale = 1;
+
+        // Reset PLAYER props
+        ExitGames.Client.Photon.Hashtable playerProps =
             new ExitGames.Client.Photon.Hashtable
             {
-                { "Ready", false },
-                { "SelectState", "Selecting" },
-                { "SongID", -1 }
+            { "Ready", false },
+            { "SelectState", "Selecting" },
+            { "SongID", -1 },
+            { "SongName", "" },
+            { "SongLevel", "" },
+            { "SongBPM", "" },
+
+            { "Score", 0 },
+            { "Perfect", 0 },
+            { "Great", 0 },
+            { "Bad", 0 },
+            { "Miss", 0 },
+            { "Combo", 0 },
+            { "HP", 0 }
             };
 
-        PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+        PhotonNetwork.LocalPlayer.SetCustomProperties(playerProps);
 
+        // Reset ROOM props (ONLY MASTER)
+        if(PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom != null)
+        {
+            ExitGames.Client.Photon.Hashtable roomProps =
+                new ExitGames.Client.Photon.Hashtable
+                {
+                { "FinalSongID", -1 },
+                { "FinalSongName", "" },
+                { "WinnerIndex", -1 }
+                };
+
+            PhotonNetwork.CurrentRoom.SetCustomProperties(roomProps);
+        }
+
+        // Destroy data holders
         if(MultiResultDataHolder.instance != null)
             Destroy(MultiResultDataHolder.instance.gameObject);
 
-        if(PhotonNetwork.InRoom)
+        if(SongDataHolder.instance != null)
         {
             SongDataHolder.instance.SetMultiLive(false);
+        }
+
+
+        if(PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.AutomaticallySyncScene = false;
             PhotonNetwork.LeaveRoom();
         }
         else
+        {
             SceneManager.LoadScene("HomeScreen");
+        }
     }
 
     public override void OnLeftRoom()
@@ -155,8 +221,6 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
         string jsonString = JsonUtility.ToJson(dataToSend);
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
 
-        Debug.Log("Sending Result: " + jsonString);
-
         using(UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -165,11 +229,7 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
 
             yield return request.SendWebRequest();
 
-            if(request.result == UnityWebRequest.Result.Success)
-            {
-                Debug.Log("Server Response: " + request.downloadHandler.text);
-            }
-            else
+            if(request.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Error sending result: " + request.error);
             }

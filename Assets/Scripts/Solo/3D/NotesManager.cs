@@ -92,7 +92,7 @@ public class NotesManager : MonoBehaviour
             }
         }
 
-        Debug.Log($"Loaded {NotesTime.Count} notes");
+        // Debug.Log($"Loaded {NotesTime.Count} notes");
     }
 
     GameObject CreateNote(NoteData data, float start, float end)

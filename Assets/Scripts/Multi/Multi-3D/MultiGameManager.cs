@@ -11,12 +11,6 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 {
     public static MultiGameManager instance;
 
-    //[Header("DEBUG BOT")]
-    //public bool debugSecondPlayerBot = false;
-    //public float botActionInterval = 0.4f;
-
-    //private float botTimer = 0f;
-
     [Header("Players")]
     public Dictionary<int, PlayerRuntimeData> players =
         new Dictionary<int, PlayerRuntimeData>();
@@ -69,29 +63,9 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
         if(!synced)
         {
-            Debug.LogError("SONG SYNC FAILED — GAME ABORTED");
+            Debug.LogError("SONG SYNC FAILED: GAME ABORTED");
             return;
         }
-
-        // DEBUG
-        //Debug.Log(
-        //    $"[MULTI GAME] Final Song = {SongDataHolder.instance.SelectedSongName} " +
-        //    $"({SongDataHolder.instance.SelectedSongId})"
-        //);
-
-        //Debug.Log(
-        //    $"[MUSIC] clip = {musicManager.audioSource.clip.name}"
-        //);
-
-        //Debug.Log(
-        //    $"[DEBUG] P1 Song = {PhotonNetwork.PlayerList[0].CustomProperties["SongName"]}"
-        //);
-        //Debug.Log(
-        //    $"[DEBUG] P2 Song = {PhotonNetwork.PlayerList[1].CustomProperties["SongName"]}"
-        //);
-        //Debug.Log(
-        //    $"[DEBUG] FINAL Song = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongName"]}"
-        //);
 
         InitPlayers();
 
@@ -101,7 +75,6 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
     void Update()
     {
         if(!PhotonNetwork.IsMasterClient) return;
-        //DebugBotUpdate();
 
         if(finishSent) return;
 
@@ -138,11 +111,6 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
         {
             double startDsp = AudioSettings.dspTime + musicDelay;
             songEndDspTime = startDsp + musicManager.audioSource.clip.length;
-
-            //Debug.Log(
-            //    $"[DSP INIT] start={startDsp:F2}, end={songEndDspTime:F2}, " +
-            //    $"length={musicManager.audioSource.clip.length:F2}"
-            //);
         }
 
         notesManager.StartGame();
@@ -267,8 +235,6 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
     [PunRPC]
     void RPC_FinishGame()
     {
-        Debug.Log("(MULTI) FINISH RECEIVED");
-
         if(musicManager.finishText != null)
             musicManager.finishText.SetActive(true);
 
@@ -279,7 +245,6 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
     {
         yield return new WaitForSeconds(1f);
         EndGame();
-        //SaveMyResultToPhoton();
     }
 
     void AddScoreInternal(int actor, int baseScore)
@@ -357,19 +322,11 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
         finishText.SetActive(true);
 
-        if(PhotonNetwork.IsMasterClient)
-        {
-            StartCoroutine(WaitAndLoad());
-        }
+        StartCoroutine(WaitAndLoad());
     }
 
     IEnumerator WaitAndLoad()
     {
-        //MultiResultDataHolder.instance.SetResults(players);
-        //MultiResultDataHolder.instance.SetMyResult(
-        //    players[PhotonNetwork.LocalPlayer.ActorNumber]
-        //);
-
         yield return new WaitForSeconds(1f);
         PhotonNetwork.LoadLevel("MultiResultScene");
     }

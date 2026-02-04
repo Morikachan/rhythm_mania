@@ -36,11 +36,6 @@ public class SongDataHolder : MonoBehaviour
         ApplySong(song);
     }
 
-    public void SetMultiLive()
-    {
-        IsMultiLive = true;
-    }
-
     public bool SyncFromRoom()
     {
         if(!IsMultiLive)
@@ -63,7 +58,6 @@ public class SongDataHolder : MonoBehaviour
         SelectedSongId = (int)props["FinalSongID"];
         SelectedSongName = props["FinalSongName"].ToString();
 
-        Debug.Log($"[SongDataHolder][MULTI] Synced from Room: {SelectedSongId}");
         return true;
     }
 

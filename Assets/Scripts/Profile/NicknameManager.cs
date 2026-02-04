@@ -93,9 +93,7 @@ public class NicknameManager : MonoBehaviour
 
         string jsonString = JsonUtility.ToJson(dataToSend);
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
-
-        Debug.Log("Sending Result: " + jsonString);
-
+        
         using(UnityWebRequest request = new UnityWebRequest(BASE_URL, "POST"))
         {
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -106,8 +104,6 @@ public class NicknameManager : MonoBehaviour
 
             if(request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("Server Response: " + request.downloadHandler.text);
-
                 // --- SUCCESS ---
                 PlayerPrefs.SetString(USER_NAME_KEY, newNick);
                 PlayerPrefs.Save();

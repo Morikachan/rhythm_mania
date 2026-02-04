@@ -17,21 +17,18 @@ public class ModeSelectButtons : MonoBehaviour
             return;
         }
 
-        // „R„‚„p„x„… „„u„‚„u„‡„€„t„y„} „r „|„€„q„q„y-„ƒ„ˆ„u„~„… („~„u „w„t„v„} callback)
         SceneManager.LoadScene("MultiLobby");
     }
 
     public void CreateOwnRoom()
     {
         // Create Room
-        // POPUP
         SceneManager.LoadScene("");
     }
 
     public void CodeConnectToRoom()
     {
         // Enter Code
-        // POPUP
         SceneManager.LoadScene("");
     }
 }

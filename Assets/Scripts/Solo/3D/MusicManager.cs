@@ -59,7 +59,7 @@ public class MusicManager : MonoBehaviour
 
         played = true;
         audioSource.Play();
-        Debug.Log($"Music started after {delay} sec delay!");
+        // Debug.Log($"Music started after {delay} sec delay!");
     }
 
     public void PauseAudio()
@@ -104,11 +104,10 @@ public class MusicManager : MonoBehaviour
         if(clip != null)
         {
             audioSource.clip = clip;
-            Debug.Log($"[MUSIC] Song set to: {songName}");
         }
         else
         {
-            Debug.LogError($"[MUSIC] Clip not found: Musics/{songName}");
+            Debug.LogError($"(MUSIC) Clip not found: Musics/{songName}");
         }
     }
 

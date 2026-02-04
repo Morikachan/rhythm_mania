@@ -85,7 +85,7 @@ public class MultiNotesManager : MonoBehaviour {
             }
         }
 
-        Debug.Log($"[MultiNotesManager] Loaded {notesObj.Count} notes");
+        // Debug.Log($"(MultiNotesManager) Loaded {notesObj.Count} notes");
     }
 
     

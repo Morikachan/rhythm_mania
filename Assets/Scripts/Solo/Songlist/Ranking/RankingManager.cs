@@ -53,18 +53,10 @@ public class RankingManager : MonoBehaviour
         {
             openRankingButton.onClick.AddListener(OnRankingButtonClicked);
         }
-        else
-        {
-            Debug.LogWarning("Ranking Button RankingManager!");
-        }
 
         if (closeRankingButton != null)
         {
             closeRankingButton.onClick.AddListener(CloseRanking);
-        }
-        else
-        {
-            Debug.LogWarning("Ranking Button RankingManager!");
         }
 
         CreateNoRankingItem();

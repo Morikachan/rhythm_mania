@@ -55,6 +55,11 @@ public class SongListManager : MonoBehaviour
 
     void Awake()
     {
+        if (SongDataHolder.instance != null)
+        {
+            SongDataHolder.instance.SetMultiLive(false);
+        }
+        
         GetJsonData();
     }
 

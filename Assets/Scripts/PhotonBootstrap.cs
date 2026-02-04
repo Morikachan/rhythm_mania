@@ -37,8 +37,7 @@ public class PhotonBootstrap : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("Photon connected (global)");
-
+        // Debug.Log("Photon connected (global)");
         string userName = PlayerPrefs.GetString(USER_NAME_KEY, "Player");
         int cardId = PlayerPrefs.GetInt(HOME_CARD_ID_KEY, 1);
 
