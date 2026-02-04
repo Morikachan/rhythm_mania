@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.UI;
+using System.Text;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class NicknameManager : MonoBehaviour
 {
@@ -14,9 +16,21 @@ public class NicknameManager : MonoBehaviour
     public Button userNamePopupConfirmButton;
 
     [Header("Configuration")]
-    private const string BASE_URL = "http://153.126.183.193/student/k248010/rhythm_mania_db/";
+    private const string BASE_URL = "http://153.126.183.193/student/k248010/rhythm_mania_db/update_user_name.php";
     private const string USER_ID_KEY = "UserID";
     private const string USER_NAME_KEY = "UserName";
+
+    [System.Serializable]
+    class UserData {
+        public string user_id;
+        public string username;
+    }
+
+    [System.Serializable]
+    public class ServerResponse {
+        public string status;
+        public string message;
+    }
 
     void Start()
     {
@@ -56,31 +70,44 @@ public class NicknameManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(SendNickChangeRequest(newNick));
+        StartCoroutine(SendJsonDataNewName(newNick));
     }
 
-    IEnumerator SendNickChangeRequest(string newNick)
+    IEnumerator SendJsonDataNewName(string newNick)
     {
-        string userId = PlayerPrefs.GetString(USER_ID_KEY, "0");
-        string url = BASE_URL + "update_user_name.php";
+        yield return null;
 
-        WWWForm form = new WWWForm();
-        form.AddField("user_id", userId);
-        form.AddField("user_name", newNick);
-
-        // Debug.Log($"Sending Request to {url}: ID={userId}, NewName={newNick}");
-
-        using (UnityWebRequest www = UnityWebRequest.Post(url, form))
+        if(!PlayerPrefs.HasKey(USER_ID_KEY))
         {
-            yield return www.SendWebRequest();
+            Debug.LogError("No UserID found, cannot send result.");
+            yield break;
+        }
 
-            if (www.result != UnityWebRequest.Result.Success)
+        int songId = SongDataHolder.instance != null ? SongDataHolder.instance.SelectedSongId : 1;
+
+        UserData dataToSend = new UserData
+        {
+            user_id = PlayerPrefs.GetString(USER_ID_KEY),
+            username = newNick,
+        };
+
+        string jsonString = JsonUtility.ToJson(dataToSend);
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonString);
+
+        Debug.Log("Sending Result: " + jsonString);
+
+        using(UnityWebRequest request = new UnityWebRequest(BASE_URL, "POST"))
+        {
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if(request.result == UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Error changing nick: " + www.error);
-                // TODO: Show an error message popup here
-            }
-            else
-            {
+                Debug.Log("Server Response: " + request.downloadHandler.text);
+
                 // --- SUCCESS ---
                 PlayerPrefs.SetString(USER_NAME_KEY, newNick);
                 PlayerPrefs.Save();
@@ -89,6 +116,10 @@ public class NicknameManager : MonoBehaviour
 
                 // Close edit popup
                 popupPanel.SetActive(false);
+            }
+            else
+            {
+                Debug.LogError("Error sending result: " + request.error);
             }
         }
     }
