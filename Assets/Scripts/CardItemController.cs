@@ -11,17 +11,17 @@ public class CardItemController : MonoBehaviour
     private CardSelectPopup popup;
 
     private const string CARD_ICONS_PATH =
-        @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_icons\";
+        "http://153.126.183.193/student/k248010/ps_game/src/cards/card_icons/";
 
     public void Setup(int id, CardSelectPopup owner, bool selected)
     {
         cardId = id;
         popup = owner;
 
-        if (CardLoader.Instance != null)
+        if (CardLoaderOnline.Instance != null)
         {
             string fileName = $"card_icon_{cardId}.png";
-            CardLoader.Instance.LoadCardIllustration(cardImage, CARD_ICONS_PATH, fileName);
+            CardLoaderOnline.Instance.LoadCardIllustration(cardImage, CARD_ICONS_PATH, fileName);
         }
 
         checkMark.gameObject.SetActive(selected);

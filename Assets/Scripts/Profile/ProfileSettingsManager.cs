@@ -62,10 +62,10 @@ public class ProfileSettingsManager : MonoBehaviour
     public string receiveUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/user-home-info.php";
 
     private const string CARD_ICONS_PATH =
-        @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_icons\";
+        "http://153.126.183.193/student/k248010/ps_game/src/cards/card_icons/";
 
     private const string CARD_SPRITES_PATH =
-        @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_sprites\";
+        "http://153.126.183.193/student/k248010/ps_game/src/cards/card_sprites/";
 
     public void Awake()
     {
@@ -112,19 +112,29 @@ public class ProfileSettingsManager : MonoBehaviour
         {
             int cardId = PlayerPrefs.GetInt(HOME_CARD_ID_KEY);
 
-            if(CardLoader.Instance != null)
+            if(CardLoaderOnline.Instance != null)
             {
                 // sprite
                 string fileNameSprite = $"card_sprite_{cardId}.png";
-                CardLoader.Instance.LoadCardIllustration(profileSprite, CARD_SPRITES_PATH, fileNameSprite);
 
                 Color tempColor = profileSprite.color;
-                tempColor.a = 1.0f;
+                tempColor.a = 0.0f;
                 profileSprite.color = tempColor;
+
+                CardLoaderOnline.Instance.LoadCardIllustration(
+                    profileSprite,
+                    CARD_SPRITES_PATH,
+                    fileNameSprite,
+                    () => {
+                        Color tempColor = profileSprite.color;
+                        tempColor.a = 1.0f;
+                        profileSprite.color = tempColor;
+                    }
+                );
 
                 // icon
                 string fileNameIcon = $"card_icon_{cardId}.png";
-                CardLoader.Instance.LoadCardIllustration(profileIcon, CARD_ICONS_PATH, fileNameIcon);
+                CardLoaderOnline.Instance.LoadCardIllustration(profileIcon, CARD_ICONS_PATH, fileNameIcon);
             }
         };
     }

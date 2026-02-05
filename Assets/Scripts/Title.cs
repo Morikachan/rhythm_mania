@@ -32,7 +32,7 @@ public class Title : MonoBehaviour {
         public string user_id;
     }
 
-    public string url = "http://localhost/rhythm_mania/Database/create-user.php";
+    public string url = "http://153.126.183.193/student/k248010/rhythm_mania_db/create-user.php";
 
     void Start()
     {

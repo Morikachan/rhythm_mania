@@ -30,7 +30,9 @@ public class MultiLobbyManager : MonoBehaviourPunCallbacks {
         ResetAllSlots();
         Time.timeScale = 1;
 
-        if(!PhotonNetwork.IsConnected)
+        SyncPlayerPropertiesWithPrefs();
+
+        if (!PhotonNetwork.IsConnected)
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene("GameModeSelection");
             return;
@@ -174,6 +176,23 @@ public class MultiLobbyManager : MonoBehaviourPunCallbacks {
         }
     }
 
+    public void SyncPlayerPropertiesWithPrefs()
+    {
+        if (PhotonNetwork.IsConnected)
+        {
+            string userName = PlayerPrefs.GetString("UserName", "Player");
+            int cardId = PlayerPrefs.GetInt("HomeCardID", 1);
+
+            ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable
+        {
+            { "UserName", userName },
+            { "CardID", cardId }
+        };
+
+            PhotonNetwork.LocalPlayer.SetCustomProperties(props);
+            PhotonNetwork.LocalPlayer.NickName = userName;
+        }
+    }
     private void ResetMyPlayerProps()
     {
         Hashtable props = new Hashtable

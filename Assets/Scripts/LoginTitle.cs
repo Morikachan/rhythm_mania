@@ -10,7 +10,7 @@ public class LoginTitle : MonoBehaviour {
     private const string USER_ID_KEY = "UserID";
 
     [Header("Server")]
-    [SerializeField] private string loginUrl = "http://localhost/rhythm_mania/Database/user_login.php";
+    [SerializeField] private string loginUrl = "http://153.126.183.193/student/k248010/rhythm_mania_db/user_login.php";
 
     [Header("UI Login Popup Button")]
     public Button openLoginPopupButton;

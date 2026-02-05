@@ -7,7 +7,8 @@ public class SongIllustLoader : MonoBehaviour
     public static SongIllustLoader instance { get; private set; }
 
     private const string SONG_ILLUST_PATH = @"C:\xampp\htdocs\rhythm_mania\Assets\UI\song_illust\";
-
+// private const string SONG_ILLUST_PATH = "http://153.126.183.193/student/k248010/ps_game/src/cards/song_illust/";
+    
     private void Awake()
     {
         if (instance != null && instance != this)
