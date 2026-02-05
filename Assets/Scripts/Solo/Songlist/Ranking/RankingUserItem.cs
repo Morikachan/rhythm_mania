@@ -24,7 +24,22 @@ public class RankingUserItem : MonoBehaviour
 
         if (PlayerCardIllustLoader.instance != null)
         {
-            PlayerCardIllustLoader.instance.LoadPlayerIllustration(userPhoto, fileName);
+            if(userPhoto != null)
+            {
+                Color tempColor = userPhoto.color;
+                tempColor.a = 0.0f;
+                userPhoto.color = tempColor;
+            }
+
+            PlayerCardIllustLoader.instance.LoadPlayerIllustration(userPhoto, fileName, () =>
+            {
+                if(userPhoto != null)
+                {
+                    Color finalColor = userPhoto.color;
+                    finalColor.a = 1.0f;
+                    userPhoto.color = finalColor;
+                }
+            });
         }
         else
         {
