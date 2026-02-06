@@ -16,7 +16,8 @@ public class HomePage : MonoBehaviour
     private const string USER_ID_KEY = "UserID";
     private const string USER_NAME_KEY = "UserName";
     private const string HOME_CARD_ID_KEY = "HomeCardID";
-    private const string CARD_ICONS_PATH = "http://153.126.183.193/student/k248010/ps_game/src/cards/card_illust/";
+    //private const string CARD_ICONS_PATH = "http://153.126.183.193/student/k248010/ps_game/src/cards/card_illust/";
+    private const string CARD_ICONS_PATH = @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_illust\";
 
     [SerializeField] Slider slider;
     [SerializeField] TMP_Text starsValue;
@@ -152,7 +153,8 @@ public class HomePage : MonoBehaviour
         if (homeImage == null) return;
 
         string fileName = $"card_{newCardID}.jpg";
-        CardLoaderOnline.Instance.LoadCardIllustration(homeImage, CARD_ICONS_PATH, fileName);
+        CardLoader.Instance.LoadCardIllustration(homeImage, CARD_ICONS_PATH, fileName);
+        //CardLoaderOnline.Instance.LoadCardIllustration(homeImage, CARD_ICONS_PATH, fileName);
     }
 
     private void UpdateProgress(int exp)

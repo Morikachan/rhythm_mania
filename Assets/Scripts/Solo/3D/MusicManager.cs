@@ -79,6 +79,11 @@ public class MusicManager : MonoBehaviour
 
     public void ResetMusic()
     {
+        if (this == null || gameObject == null)
+        {
+            return;
+        }
+
         StopAllCoroutines();
 
         if(audioSource.clip == null)

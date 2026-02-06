@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using System;
 
 public class CardLoader : MonoBehaviour
 {
@@ -15,9 +16,10 @@ public class CardLoader : MonoBehaviour
         }
 
         Instance = this;
+        DontDestroyOnLoad(this.gameObject);
     }
 
-    public void LoadCardIllustration(Image targetImage, string path, string fileName)
+    public void LoadCardIllustration(Image targetImage, string path, string fileName, Action onLoaded = null)
     {
         if (targetImage == null)
         {
@@ -33,6 +35,10 @@ public class CardLoader : MonoBehaviour
             if (newSprite != null)
             {
                 targetImage.sprite = newSprite;
+                if (onLoaded != null)
+                {
+                    onLoaded.Invoke();
+                }
             }
             else
             {

@@ -117,8 +117,12 @@ public class GameManager : MonoBehaviour, INoteSpeedProvider
 
         Time.timeScale = 1;
 
-        musicManager.PauseAudio();
-        musicManager.ResetMusic();
+        if (musicManager != null)
+        {
+            musicManager.PauseAudio();
+            musicManager.ResetMusic();
+        }
+
         HPManager.instance.ResetHP();
         Destroy(this.gameObject);
     }

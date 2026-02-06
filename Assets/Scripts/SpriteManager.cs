@@ -7,7 +7,8 @@ public class GameModeManager : MonoBehaviour
     public Image userSprite;
 
     private const string CARD_SPRITES_PATH =
-        "http://153.126.183.193/student/k248010/ps_game/src/cards/card_sprites/";
+        //"http://153.126.183.193/student/k248010/ps_game/src/cards/card_sprites/";
+        @"C:\xampp\htdocs\rhythm_mania\Assets\Cards\card_sprites\";
 
     void Start()
     {
@@ -20,7 +21,8 @@ public class GameModeManager : MonoBehaviour
         {
             int cardId = PlayerPrefs.GetInt(HOME_CARD_ID_KEY);
 
-            if(CardLoaderOnline.Instance != null)
+            if (CardLoader.Instance != null)
+            //if (CardLoaderOnline.Instance != null)
             {
                 string fileNameSprite = $"card_sprite_{cardId}.png";
 
@@ -28,7 +30,8 @@ public class GameModeManager : MonoBehaviour
                 tempColor.a = 0.0f;
                 userSprite.color = tempColor;
 
-                CardLoaderOnline.Instance.LoadCardIllustration(
+                CardLoader.Instance.LoadCardIllustration(
+                //CardLoaderOnline.Instance.LoadCardIllustration(
                     userSprite,
                     CARD_SPRITES_PATH,
                     fileNameSprite,
