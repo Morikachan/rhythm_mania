@@ -5,12 +5,14 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Text;
+using UnityEngine.UI;
 
 public class MultiResultFlow : MonoBehaviourPunCallbacks {
     public GameObject multiResult;
     public GameObject playerResult;
     public MultiPlayerResult playerResultScript;
-
+    public Button nextButton;
+    public Button returnButton;
 
     private bool showedPlayer = false;
     private bool manuallyLeaving = false;
@@ -38,6 +40,9 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
 
     void Start()
     {
+        nextButton.onClick.AddListener(OnNext);
+        returnButton.onClick.AddListener(OnReturnButtonClicked);
+
         if(PhotonNetwork.IsConnected)
         {
             PhotonNetwork.AutomaticallySyncScene = false;
@@ -98,34 +103,17 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
         }
         else
         {
-            manuallyLeaving = true;
-            LeaveAndReset();
+            OnReturnButtonClicked();
         }
     }
 
-    //public void LeaveAndReset()
-    //{
-    //    ExitGames.Client.Photon.Hashtable props =
-    //        new ExitGames.Client.Photon.Hashtable
-    //        {
-    //            { "Ready", false },
-    //            { "SelectState", "Selecting" },
-    //            { "SongID", -1 }
-    //        };
+    public void OnReturnButtonClicked()
+    {
+        if(manuallyLeaving) return;
 
-    //    PhotonNetwork.LocalPlayer.SetCustomProperties(props);
-
-    //    if(MultiResultDataHolder.instance != null)
-    //        Destroy(MultiResultDataHolder.instance.gameObject);
-
-    //    if(PhotonNetwork.InRoom)
-    //    {
-    //        SongDataHolder.instance.SetMultiLive(false);
-    //        PhotonNetwork.LeaveRoom();
-    //    }
-    //    else
-    //        SceneManager.LoadScene("HomeScreen");
-    //}
+        manuallyLeaving = true;
+        LeaveAndReset();
+    }
 
     public void LeaveAndReset()
     {
@@ -190,12 +178,10 @@ public class MultiResultFlow : MonoBehaviourPunCallbacks {
 
     public override void OnLeftRoom()
     {
-        if(!manuallyLeaving)
+        if(manuallyLeaving)
         {
-            return; // DO NOTHING
+            SceneManager.LoadScene("HomeScreen");
         }
-
-        SceneManager.LoadScene("HomeScreen");
     }
 
     IEnumerator SendJsonData()

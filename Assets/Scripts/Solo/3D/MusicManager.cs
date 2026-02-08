@@ -30,10 +30,21 @@ public class MusicManager : MonoBehaviour
     {
         if(played && audioSource.isPlaying)
         {
-            if(audioSource.time >= audioSource.clip.length - 0.1f && !isMulti)
+            if(audioSource.time >= audioSource.clip.length - 0.1f)
             {
-                played = false;
-                StartCoroutine(EndGame());
+                if(!isMulti)
+                {
+                    played = false;
+                    StartCoroutine(EndGame());
+                }
+                else
+                {
+                    played = false;
+                    if(MultiGameManager.instance != null)
+                    {
+                        MultiGameManager.instance.EndGame();
+                    }
+                }
             }
         }
     }
@@ -59,7 +70,6 @@ public class MusicManager : MonoBehaviour
 
         played = true;
         audioSource.Play();
-        // Debug.Log($"Music started after {delay} sec delay!");
     }
 
     public void PauseAudio()

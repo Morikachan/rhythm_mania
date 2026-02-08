@@ -34,7 +34,7 @@ public class MultiLobbyManager : MonoBehaviourPunCallbacks {
 
         if (!PhotonNetwork.IsConnected)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("GameModeSelection");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("HomeScreen");
             return;
         }
 

@@ -1,39 +1,60 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using Photon.Pun;
-using Photon.Realtime;
 using System.Linq;
 
 public class MultiResultUI : MonoBehaviour {
+
+    [Header("Winner UI")]
     public Image WinnerResultImage;
-    public Image SecondResultImage;
+    public Image WinnerBadgeBg;
 
     public TextMeshProUGUI WinnerResultNick;
-    public TextMeshProUGUI SecondResultNick;
-
     public TextMeshProUGUI WinnerResultScore;
+    public TextMeshProUGUI WinnerBadgeText;
+
+    public Image SecondResultImage;
+    public Image SecondBadgeBg;
+
+    public TextMeshProUGUI SecondResultNick;
     public TextMeshProUGUI SecondResultScore;
+    public TextMeshProUGUI SecondBadgeText;
 
     void Start()
     {
-        var players = PhotonNetwork.PlayerList.OrderByDescending(p =>
-            p.CustomProperties.ContainsKey("Score") ? (int)p.CustomProperties["Score"] : 0
-        ).ToList();
+        var sortedPlayers = MultiGameDataStorage.CachedPlayers.Values
+            .OrderByDescending(p => p.Score)
+            .ToList();
 
-        if(players.Count > 0)
-            SetupFromPhoton(players[0], WinnerResultImage, WinnerResultNick, WinnerResultScore);
+        if(sortedPlayers.Count > 0)
+            SetupResultSlot(sortedPlayers[0], WinnerResultImage, WinnerResultNick, WinnerResultScore, WinnerBadgeText, WinnerBadgeBg);
 
-        if(players.Count > 1)
-            SetupFromPhoton(players[1], SecondResultImage, SecondResultNick, SecondResultScore);
+        if(sortedPlayers.Count > 1)
+            SetupResultSlot(sortedPlayers[1], SecondResultImage, SecondResultNick, SecondResultScore, SecondBadgeText, SecondBadgeBg);
     }
 
-    void SetupFromPhoton(Player p, Image img, TextMeshProUGUI nick, TextMeshProUGUI score)
+    void SetupResultSlot(MultiGameDataStorage.PlayerInfo p, Image img, TextMeshProUGUI nick, TextMeshProUGUI score, TextMeshProUGUI badge, Image badgeBg)
     {
-        nick.text = p.CustomProperties["UserName"].ToString();
-        score.text = p.CustomProperties.ContainsKey("Score") ? p.CustomProperties["Score"].ToString() : "0";
+        nick.text = p.Nickname;
+        score.text = p.Score.ToString();
+        PlayerCardIllustLoader.instance.LoadPlayerIllustration(img, $"game_icon_{p.CardID}.png");
 
-        int cardId = p.CustomProperties.ContainsKey("CardID") ? (int)p.CustomProperties["CardID"] : 0;
-        PlayerCardIllustLoader.instance.LoadPlayerIllustration(img, $"game_icon_{cardId}.png");
+        if(p.InitialPosition == 1)
+        {
+            badge.text = "P1";
+            badgeBg.color = HexToColor("FF0046");
+        }
+        else
+        {
+            badge.text = "P2";
+            badgeBg.color = HexToColor("B600FF");
+        }
+    }
+
+    Color HexToColor(string hex)
+    {
+        Color col;
+        ColorUtility.TryParseHtmlString("#" + hex, out col);
+        return col;
     }
 }

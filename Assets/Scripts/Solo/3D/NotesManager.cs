@@ -36,7 +36,7 @@ public class NotesManager : MonoBehaviour
     public float spawnOffset = 15f;
 
     private float bpm = 120f;
-    private float songStartTime;
+    public float songStartTime;
     public bool started = false;
 
     private const float judgeZ = 0f;

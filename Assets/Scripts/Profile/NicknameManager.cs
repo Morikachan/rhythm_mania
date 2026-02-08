@@ -4,7 +4,6 @@ using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.UI;
 using System.Text;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class NicknameManager : MonoBehaviour
 {

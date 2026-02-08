@@ -51,8 +51,6 @@ public class MultiJudge : MonoBehaviour
         switch(result.type)
         {
             case JudgeType.Perfect:
-                //MultiGameManager.instance.players[localActor].perfect++;
-                //MultiGameManager.instance.AddScore(localActor, 1000);
                 MultiGameManager.instance.SendJudge(
                     localActor,
                     JudgeType.Perfect,
@@ -61,8 +59,6 @@ public class MultiJudge : MonoBehaviour
                 break;
 
             case JudgeType.Great:
-                //MultiGameManager.instance.players[localActor].great++;
-                //MultiGameManager.instance.AddScore(localActor, 700);
                 MultiGameManager.instance.SendJudge(
                     localActor,
                     JudgeType.Great,
@@ -71,10 +67,6 @@ public class MultiJudge : MonoBehaviour
                 break;
 
             case JudgeType.Bad:
-                //MultiGameManager.instance.players[localActor].bad++;
-                //MultiGameManager.instance.ResetCombo(localActor);
-                //MultiGameManager.instance.Damage(localActor, 50);
-
                 MultiGameManager.instance.SendJudge(
                     localActor,
                     JudgeType.Bad
@@ -87,14 +79,6 @@ public class MultiJudge : MonoBehaviour
 
     public void OnMiss()
     {
-        //int actor = PhotonNetwork.LocalPlayer.ActorNumber;
-
-        //MultiGameManager.instance.players[actor].miss++;
-        //MultiGameManager.instance.ResetCombo(actor);
-        //MultiGameManager.instance.Damage(actor, 100);
-
-        //ShowMissEffect();
-
         int actor = PhotonNetwork.LocalPlayer.ActorNumber;
 
         MultiGameManager.instance.SendJudge(

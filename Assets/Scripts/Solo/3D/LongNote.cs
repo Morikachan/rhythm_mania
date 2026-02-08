@@ -7,22 +7,24 @@ public class LongNote : MonoBehaviour {
     public float endTime;
 
     [Header("Refs")]
-    private Judge judge;
     private NotesManager notes;
+    private Judge judge;
 
     [Header("Parts")]
     private Transform startPart;
     private Transform bodyPart;
     private Transform endPart;
 
-    [Header("State")]
-    private bool holding = false;
-    private bool completed = false;
-    private bool releasedEarly = false;
+    [Header("Tick Settings")]
+    private float tickInterval;
 
-    [Header("Tick")]
-    [SerializeField] private float tickInterval = 0.15f;
-    private float nextTickTime;
+    private int totalTicks;
+    private int processedTicks;
+
+    private bool tickStarted = false;
+    private float tickStartTime;
+
+    private bool completed = false;
 
     [Header("Visual")]
     [SerializeField] private float visualEndGap = 0.05f;
@@ -30,6 +32,8 @@ public class LongNote : MonoBehaviour {
     private float judgeZ;
     private float spawnOffset;
     private float speed => GameManager.instance.noteSpeed;
+
+    // ---------------- INIT ----------------
 
     public void Init(
         int lane,
@@ -52,40 +56,42 @@ public class LongNote : MonoBehaviour {
         startPart = transform.Find("Start");
         bodyPart = transform.Find("Body");
         endPart = transform.Find("End");
+
+        totalTicks = 5;
+
+        tickInterval = (endTime - startTime) / totalTicks;
+        tickInterval = Mathf.Max(0.05f, tickInterval);
     }
+
+    // ---------------- UPDATE ----------------
 
     void Update()
     {
-        if(!GameManager.instance.gameStarted || completed)
+        if(!notes.started || completed)
             return;
 
-        float songTime = Time.time - GameManager.instance.startTime;
+        float songTime = Time.time - notes.songStartTime;
 
         float zStart = judgeZ + (startTime - songTime) * speed + spawnOffset;
         float zEnd = judgeZ + (endTime - songTime) * speed + spawnOffset;
 
         UpdateVisual(zStart, zEnd);
 
-        if(!holding)
-        {
-            TryStartHold(zStart);
-        }
-        else
-        {
-            HandleTickScore();
-            CheckEarlyRelease();
-            TryEndHold(zEnd);
-        }
+        TryStartTicks(zStart);
+        HandleTicks();
 
-        if(!holding && zEnd < judgeZ - 0.4f)
-            Miss();
+        // полностью прошла judge line
+        if(zEnd < judgeZ - 0.4f)
+            FinishNote();
     }
+
+    // ---------------- VISUAL ----------------
 
     void UpdateVisual(float zStart, float zEnd)
     {
         float length;
 
-        if(!holding)
+        if(!tickStarted)
         {
             length = zEnd - zStart;
             if(length <= 0) return;
@@ -100,110 +106,68 @@ public class LongNote : MonoBehaviour {
 
         bodyPart.localScale = new Vector3(1, 0.01f, length);
         bodyPart.localPosition = new Vector3(0, 0, length * 0.5f);
-
         endPart.localPosition = new Vector3(0, 0, length + visualEndGap);
     }
 
-    void TryStartHold(float zStart)
+    // ---------------- START TICKS ----------------
+
+    void TryStartTicks(float zStart)
     {
-        if(!IsKeyJustPressed())
-            return;
+        if(tickStarted) return;
 
-        float dist = Mathf.Abs(zStart - judgeZ);
-
-        if(dist <= 0.2f)
-            StartHold(true);
-        else if(dist <= 0.4f)
-            StartHold(false);
+        // стартуем judge только когда START дошёл до линии
+        if(zStart <= judgeZ)
+        {
+            tickStarted = true;
+            tickStartTime = Time.time;
+        }
     }
 
-    void StartHold(bool perfect)
-    {
-        holding = true;
-        nextTickTime = Time.time + tickInterval;
+    // ---------------- TICKS ----------------
 
-        if(perfect) GameManager.instance.perfect++;
-        else GameManager.instance.great++;
-        GameManager.instance.AddScore(perfect ? 1000 : 300);
-        judge.ShowJudge(perfect ? 0 : 1);
+    void HandleTicks()
+    {
+        if(!tickStarted) return;
+
+        while(processedTicks < totalTicks &&
+               Time.time >= tickStartTime + processedTicks * tickInterval)
+        {
+            ProcessTick();
+            processedTicks++;
+        }
     }
 
-    // TICK SCORE
-    void HandleTickScore()
+    void ProcessTick()
     {
-        if(releasedEarly) return;
-
-        if(Time.time >= nextTickTime)
+        if(IsKeyPressed())
         {
             GameManager.instance.perfect++;
             GameManager.instance.AddScore(50);
-            nextTickTime += tickInterval;
-        }
-    }
-
-    // EARLY RELEASE -> Bad
-    void CheckEarlyRelease()
-    {
-        if(releasedEarly) return;
-
-        if(!IsKeyPressed())
-        {
-            releasedEarly = true;
-            GameManager.instance.bad++;
-            judge.ShowJudge(2);
-            HPManager.instance.ApplyJudge(Judge.JudgeType.Bad);
-        }
-    }
-
-    // END HOLD
-    void TryEndHold(float zEnd)
-    {
-        if(zEnd <= judgeZ)
-            EndHold();
-    }
-
-    void EndHold()
-    {
-        completed = true;
-
-        if(!releasedEarly)
-        {
-            GameManager.instance.perfect++;
-            GameManager.instance.AddScore(500);
             judge.ShowJudge(0);
         }
+        else
+        {
+            GameManager.instance.miss++;
+            GameManager.instance.ResetCombo();
+            HPManager.instance.ApplyJudge(Judge.JudgeType.Bad);
+            judge.ShowJudge(3);
 
+            if(notes)
+                notes.ShowMissFromLong();
+        }
+    }
+
+    // ---------------- END ----------------
+
+    void FinishNote()
+    {
+        completed = true;
         Destroy(gameObject, 0.05f);
     }
 
-    void Miss()
-    {
-        completed = true;
+    // ---------------- INPUT ----------------
 
-        GameManager.instance.miss++;
-        GameManager.instance.ResetCombo();
-        HPManager.instance.ApplyJudge(Judge.JudgeType.Miss);
-
-        if(notes)
-            notes.ShowMissFromLong();
-
-        Destroy(gameObject);
-    }
-
-    // INPUT
     float LaneToX(int lane) => lane - 1.5f;
-
-    bool IsKeyJustPressed()
-    {
-        return lane switch
-        {
-            0 => Input.GetKeyDown(KeyCode.D),
-            1 => Input.GetKeyDown(KeyCode.F),
-            2 => Input.GetKeyDown(KeyCode.J),
-            3 => Input.GetKeyDown(KeyCode.K),
-            _ => false
-        };
-    }
 
     bool IsKeyPressed()
     {

@@ -17,6 +17,9 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
     public int localActor;
 
+    private int player1ActorID = -1;
+    private int player2ActorID = -1;
+
     [Header("UI")]
     public Image player1Icon;
     public Image player2Icon;
@@ -67,6 +70,10 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
             return;
         }
 
+        var players = PhotonNetwork.PlayerList;
+        if(players.Length > 0) player1ActorID = players[0].ActorNumber;
+        if(players.Length > 1) player2ActorID = players[1].ActorNumber;
+
         InitPlayers();
 
         StartCoroutine(StartGameAfterDelay());
@@ -77,6 +84,13 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
         if(!PhotonNetwork.IsMasterClient) return;
 
         if(finishSent) return;
+
+        // If the Master has changed and the end time is not set
+        if(songEndDspTime < 0 && musicManager.audioSource.clip != null)
+        {
+            float remaining = musicManager.audioSource.clip.length - musicManager.audioSource.time;
+            songEndDspTime = AudioSettings.dspTime + remaining;
+        }
 
         if(songEndDspTime < 0)
             return;
@@ -116,6 +130,28 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
         notesManager.StartGame();
     }
 
+    void SavePlayersForResults()
+    {
+        MultiGameDataStorage.CachedPlayers.Clear();
+        var photonPlayers = PhotonNetwork.PlayerList;
+
+        for(int i = 0; i < photonPlayers.Length; i++)
+        {
+            var p = photonPlayers[i];
+
+            MultiGameDataStorage.PlayerInfo info = new MultiGameDataStorage.PlayerInfo
+            {
+                Nickname = p.CustomProperties.ContainsKey("UserName") ? p.CustomProperties["UserName"].ToString() : p.NickName,
+                CardID = p.CustomProperties.ContainsKey("CardID") ? (int)p.CustomProperties["CardID"] : 0,
+                Score = 0,
+                InitialPosition = i + 1,
+                IsLocal = p.IsLocal,
+            };
+
+            MultiGameDataStorage.CachedPlayers[p.ActorNumber] = info;
+        }
+    }
+
     void InitPlayers()
     {
         foreach(Player p in PhotonNetwork.PlayerList)
@@ -129,6 +165,7 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
         localActor = PhotonNetwork.LocalPlayer.ActorNumber;
 
+        SavePlayersForResults();
         SetupPlayerIcons();
         UpdateLocalHP();
         SetupComboVisibility();
@@ -182,11 +219,12 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
     void UpdateScoreAndComboUI()
     {
-        // LOCAL PLAYER
-        var localData = players[localActor];
-
-        comboText.text = localData.combo.ToString();
-        scoreText.text = localData.score.ToString();
+        if(players.ContainsKey(localActor))
+        {
+            var localData = players[localActor];
+            comboText.text = localData.combo.ToString();
+            scoreText.text = localData.score.ToString();
+        }
 
         // TOP UI
         foreach(var pair in players)
@@ -194,10 +232,15 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
             int actor = pair.Key;
             int combo = pair.Value.combo;
 
-            if(actor == PhotonNetwork.PlayerList[0].ActorNumber)
+            if(actor == player1ActorID)
+            {
                 player1Combo.text = combo.ToString();
-            else if(actor == PhotonNetwork.PlayerList[1].ActorNumber)
+            }
+
+            else if(actor == player2ActorID)
+            {
                 player2Combo.text = combo.ToString();
+            }
         }
     }
 
@@ -290,6 +333,11 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
 
         UpdateScoreAndComboUI();
         UpdateLocalHP();
+
+        if(MultiGameDataStorage.CachedPlayers.ContainsKey(actor))
+        {
+            MultiGameDataStorage.CachedPlayers[actor].Score = players[actor].score;
+        }
     }
 
     public void SendJudge(int actor, MultiJudge.JudgeType type, int baseScore = 0)
@@ -306,6 +354,11 @@ public class MultiGameManager : MonoBehaviourPunCallbacks, INoteSpeedProvider
     public void EndGame()
     {
         var myData = players[PhotonNetwork.LocalPlayer.ActorNumber];
+
+        if(MultiGameDataStorage.CachedPlayers.ContainsKey(PhotonNetwork.LocalPlayer.ActorNumber))
+        {
+            MultiGameDataStorage.CachedPlayers[PhotonNetwork.LocalPlayer.ActorNumber].Score = myData.score;
+        }
 
         Hashtable props = new Hashtable
         {

@@ -146,6 +146,8 @@ MonoBehaviour:
     song_name: 
     song_level: 0
     song_bpm: 0
+    best_score: 0
+    best_combo: 
 --- !u!114 &2549926333383588570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -404,8 +406,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2.6695862, y: 2.6696014}
-  m_SizeDelta: {x: 457.0904, y: 76.0054}
+  m_AnchoredPosition: {x: 2.6695862, y: 0.000083447}
+  m_SizeDelta: {x: 457.0904, y: 100.33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6775150276464338575
 CanvasRenderer:
@@ -462,8 +464,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 62
-  m_fontSizeBase: 62
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
