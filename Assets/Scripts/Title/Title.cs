@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking; // For HTTP-call
-using System.Collections;
 using System.Text;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,6 +12,7 @@ public class Title : MonoBehaviour {
 
     [SerializeField] GameObject createUserPop;
 
+    public Button ScreenButton;
     public Button ConfirmButton;
     public TMP_InputField UserEmailInputField;
     public TMP_InputField UsernameInputField;
@@ -37,16 +37,10 @@ public class Title : MonoBehaviour {
     void Start()
     {
         ConfirmButton.onClick.AddListener(ConfirmButtonClick);
-    }
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        { 
-            if(!createUserPop.activeSelf)
-            {
-                OnScreenClicked();
-            }
+        if(ScreenButton != null)
+        {
+            ScreenButton.onClick.AddListener(OnScreenClicked);
         }
     }
 
@@ -122,5 +116,6 @@ public class Title : MonoBehaviour {
     void OnDestroy()
     {
         ConfirmButton.onClick.RemoveListener(ConfirmButtonClick);
+        if(ScreenButton != null) ScreenButton.onClick.RemoveListener(OnScreenClicked);
     }
 }   

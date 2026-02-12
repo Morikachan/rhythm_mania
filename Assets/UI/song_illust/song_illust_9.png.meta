@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 53671976f0d070942b4a4763fecbc644
+guid: 9309fc89383df9e459846e97cbf2aefa
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4780303776093820557
-    second: song_illust_5_0
+      213: 7086817393161561400
+    second: song_illust_9_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: song_illust_5_0
+      name: song_illust_9_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 700
-        height: 700
+        width: 426
+        height: 386
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3792873fa03f8adb0800000000000000
-      internalID: -4780303776093820557
+      spriteID: 835647b1fde695260800000000000000
+      internalID: 7086817393161561400
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      song_illust_5_0: -4780303776093820557
+      song_illust_9_0: 7086817393161561400
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

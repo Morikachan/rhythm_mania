@@ -201,30 +201,6 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         {
             Player[] players = PhotonNetwork.PlayerList;
 
-            // if(players.Length > 0)
-            // {
-            //     Debug.Log(
-            //         $"[DEBUG] P1 SelectState = {players[0].CustomProperties["SelectState"]}, " +
-            //         $"SongID = {players[0].CustomProperties["SongID"]}, " +
-            //         $"SongName = {players[0].CustomProperties["SongName"]}"
-            //     );
-            // }
-
-            // if(players.Length > 1)
-            // {
-            //     Debug.Log(
-            //         $"[DEBUG] P2 SelectState = {players[1].CustomProperties["SelectState"]}, " +
-            //         $"SongID = {players[1].CustomProperties["SongID"]}, " +
-            //         $"SongName = {players[1].CustomProperties["SongName"]}"
-            //     );
-            // }
-
-            // Debug.Log(
-            //     $"[DEBUG] FINAL SongID = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongID"]}, " +
-            //     $"FINAL SongName = {PhotonNetwork.CurrentRoom.CustomProperties["FinalSongName"]}, " +
-            //     $"WinnerIndex = {PhotonNetwork.CurrentRoom.CustomProperties["WinnerIndex"]}"
-            // );
-
             int songId = (int)PhotonNetwork.CurrentRoom.CustomProperties["FinalSongID"];
             int winnerIndex = PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("WinnerIndex")
                 ? (int)PhotonNetwork.CurrentRoom.CustomProperties["WinnerIndex"]
@@ -424,10 +400,10 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
         if(allSongs == null || allSongs.Count == 0)
             yield break;
 
-        //Song randomSong = allSongs[UnityEngine.Random.Range(0, allSongs.Count)];
+        Song randomSong = allSongs[UnityEngine.Random.Range(0, allSongs.Count)];
         // TEST: ONLY 2 songs
-        int max = Mathf.Min(2, allSongs.Count);
-        Song randomSong = allSongs[UnityEngine.Random.Range(0, max)];
+        //int max = Mathf.Min(2, allSongs.Count);
+        //Song randomSong = allSongs[UnityEngine.Random.Range(0, max)];
 
         photonView.RPC(
             nameof(RPC_ShowWinner),
@@ -472,16 +448,6 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
     [PunRPC]
     void RPC_ShowWinner(int winnerIndex, string name, string level, string bpm, int songId)
     {
-        //Player1RulletPanel.gameObject.SetActive(winnerIndex == 0);
-        //Player2RulletPanel.gameObject.SetActive(winnerIndex == 1);
-
-        //songManager.PlayMusic(name);
-
-        //songName.text = name;
-        //songLevel.text = level;
-        //songBPM.text = bpm;
-        //DisplaySongIllust(songId, songIllust);
-
         Player1RulletPanel.SetActive(false);
         Player2RulletPanel.SetActive(false);
 
@@ -491,7 +457,7 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
             Player2RulletPanel.SetActive(true);
         else
         {
-            // оба Recommended → оба скрыты (или покажи спец-панель)
+            // TODO Recommended -> Create panel for Random
         }
 
         songManager.PlayMusic(name);
@@ -663,11 +629,6 @@ public class RoomPhaseManager : MonoBehaviourPunCallbacks {
 
     void CancelTimerAndCoroutines()
     {
-        // if (timerCoroutine != null)
-        // {
-        //     StopCoroutine(timerCoroutine);
-        //     timerCoroutine = null;
-        // }
         StopAllCoroutines();
         timerCoroutine = null;
         isLoadingGame = false;
